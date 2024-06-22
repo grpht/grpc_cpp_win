@@ -24,9 +24,6 @@
     <ClCompile Include="RpcServer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="GreeterService.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Common\src\models\greeter.grpc.pb.cc">
       <Filter>소스 파일\models</Filter>
     </ClCompile>

@@ -15,11 +15,44 @@
 
 #include "RpcJob.h"
 
+#define SERVER_UNARY(FUNC,REQ,RES) \
+virtual ::grpc::ServerUnaryReactor* FUNC( \
+::grpc::CallbackServerContext* context, const REQ* request, RES* response) \
+{ \
+	grpc::ServerUnaryReactor* reactor = context->DefaultReactor(); \
+	reactor->Finish(Server##FUNC(request, response)); \
+	return reactor; \
+} \
+virtual ::grpc::Status Server##FUNC(const REQ* request, RES* response) = 0; \
+
+#define CLIENT_UNARY(FUNC,REQ,RES) \
+public: \
+void Server##FUNC (const REQ& request) { \
+auto* call = new RpcJob<RES>(); \
+call->data = std::make_unique<RES>(); \
+call->execute = [this](google::protobuf::Message* response, std::any stream) { \
+	auto* typedResponse = static_cast<RES*>(response); \
+	this->On##FUNC(typedResponse); \
+}; \
+call->response_reader = _stub->PrepareAsync##FUNC(&call->context, request, &_rpcCompletionQueue); \
+call->response_reader->StartCall(); \
+call->response_reader->Finish(static_cast<RES*>(call->data.get()), &call->status, (void*)call); \
+} \
+protected: \
+virtual void On##FUNC(const RES* response) = 0; \
+
+#define CAST_SERVER_BISTREAM(FUNC, stream) std::any_cast<FUNC##BiStream*>(stream)
+
+#define CAST_SERVER_WRITER(FUNC, stream) std::any_cast<FUNC##SvrWriter*>(stream)
+
+#define CAST_CLIENT_WRITER(FUNC, stream) std::any_cast<FUNC##CltWriter*>(stream)
+
+
 template<typename T>
 class RpcDoneModule
 {
 public:
-	void RegisterDone(std::funcion<void(T*, const grpc::Status&)> doneCallback)
+	void RegisterDone(std::function<void(T*, const grpc::Status&)> doneCallback)
 	{
 		_doneCallback = doneCallback;
 	}
@@ -57,7 +90,7 @@ protected:
 		if (!_pendingSend.empty()) {
 			{
 				std::lock_guard<std::mutex> lock(_mu);
-				std::cout << "q size: " << _pendingSend.size() << std::endl;
+				//std::cout << "q size: " << _pendingSend.size() << std::endl;
 				_currentSending = std::move(_pendingSend.front());
 				_pendingSend.pop();
 			}
@@ -80,7 +113,7 @@ template<typename T>
 class RpcServerReadModule
 {
 public:
-	void RegisterRead(RpcJobQueue<RpcJobBase>* jobQ, std::function<void(grpc::CallbackServerContext*, const T*, std::any stream) readCallback)
+	void RegisterRead(RpcJobQueue<RpcJobBase>* jobQ, std::function<void(grpc::CallbackServerContext*, const T*, std::any stream)> readCallback)
 	{
 		_jobQueue = jobQ;
 		_readCallback = readCallback;
@@ -96,7 +129,7 @@ protected:
 		call->stream = this;
 		call->execute = [this](google::protobuf::Message* message, std::any stream) {
 			auto* castedMessage = static_cast<T*>(message);
-			this->_readCallback(_context, castedMessage, stream);
+			this->_readCallback(GetServerContext(), castedMessage, stream);
 			};
 		_jobQueue->Push(call);
 		RpcRead(&_readMessage);
@@ -104,14 +137,14 @@ protected:
 protected:
 	T _readMessage;
 	RpcJobQueue<RpcJobBase>* _jobQueue = nullptr;
-	std::function(void(grpc::CallbackServerContext*, const T*, std::any stream)) _readCallback;
+	std::function<void(grpc::CallbackServerContext*, const T*, std::any stream)> _readCallback;
 };
 
 template<typename T>
 class RpcClientReadModule
 {
 public:
-	void RegisterRead(RpcJobQueue<RpcJobBase>* jobQ, std::function<void(const T*, std::any stream) readCallback)
+	void RegisterRead(RpcJobQueue<RpcJobBase>* jobQ, std::function<void(const T*, std::any stream)> readCallback)
 	{
 		_jobQueue = jobQ;
 		_readCallback = readCallback;
@@ -133,5 +166,5 @@ protected:
 protected:
 	T _readMessage;
 	RpcJobQueue<RpcJobBase>* _jobQueue = nullptr;
-	std::function(void(const T*, std::any stream)) _readCallback;
+	std::function<void(const T*, std::any stream)> _readCallback;
 };

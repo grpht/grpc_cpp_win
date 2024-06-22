@@ -10,29 +10,15 @@
 #include <thread>
 #include <chrono>
 
-#include "absl/flags/flag.h"
-#include "absl/flags/parse.h"
-#include "absl/strings/str_format.h"
-
 #include "RpcService.h"
+#include "RpcTemplate.h"
 
 #include "greeter.grpc.pb.h"
 
 using namespace helloworld;
 
-#define SERVER_UNARY(FUNC,REQ,RES) \
-virtual ::grpc::ServerUnaryReactor* FUNC( \
-::grpc::CallbackServerContext* context, const REQ* request, RES* response) \
-{ \
-	grpc::ServerUnaryReactor* reactor = context->DefaultReactor(); \
-	reactor->Finish(Server##FUNC(request, response)); \
-	return reactor; \
-} \
-virtual ::grpc::Status Server##FUNC(const REQ* request, RES* response) = 0; \
-
-
 #define USING_SERVER_BISTREAM(FUNC,REQ,RES) \
-class FUNC##BiStream : public grpc::ServerBidiReactor<REQ, RES> {\
+class FUNC##SvrBiStream : public grpc::ServerBidiReactor<REQ, RES> {\
 public: \
 	FUNC##BiStream(grpc::CallbackServerContext* context, RpcJobQueue<RpcJobBase>* jobQ, \
 		std::function<void(grpc::CallbackServerContext*, const REQ*, std::any stream)> callback) \
@@ -99,7 +85,7 @@ private: \
 }; \
 
 #define USING_SERVER_SSTREAM(FUNC,REQ,RES) \
-class FUNC##Writer : public grpc::ServerWriteReactor<RES>{ \
+class FUNC##SvrWriter : public grpc::ServerWriteReactor<RES>{ \
 public: \
 	FUNC##Writer(grpc::CallbackServerContext* context, const REQ& request) \
 		:_context(context) { _request.CopyFrom(request); } \
@@ -147,9 +133,9 @@ private: \
 	std::shared_ptr<FUNC##Writer> mThis; \
 }; \
 
-class SayHelloBDSBiStream : public grpc::ServerBidiReactor<HelloRequest, HelloReply> {
+class SayHelloBDSSvrBiStream : public grpc::ServerBidiReactor<HelloRequest, HelloReply> {
 public:
-	SayHelloBDSBiStream(grpc::CallbackServerContext* context, RpcJobQueue<RpcJobBase>* jobQ, std::function<void(grpc::CallbackServerContext*, const HelloRequest*, std::any stream)> callback)
+	SayHelloBDSSvrBiStream(grpc::CallbackServerContext* context, RpcJobQueue<RpcJobBase>* jobQ, std::function<void(grpc::CallbackServerContext*, const HelloRequest*, std::any stream)> callback)
 		:_context(context), _jobQueue(jobQ), _callback(callback)
 	{
 		StartRead(&_request);
@@ -205,10 +191,10 @@ private:
 	std::function<void(grpc::CallbackServerContext*, const HelloRequest*, std::any stream)> _callback;
 };
 
-class SayHelloStreamReplyWriter : public grpc::ServerWriteReactor<HelloReply>
+class SayHelloStreamReplySvrWriter : public grpc::ServerWriteReactor<HelloReply>
 {
 public:
-	SayHelloStreamReplyWriter(grpc::CallbackServerContext* context)
+	SayHelloStreamReplySvrWriter(grpc::CallbackServerContext* context)
 		:_context(context) 
 	{
 	} 
@@ -267,7 +253,7 @@ protected:
 	class RpcClientSession
 	{
 	public:
-		SayHelloBDSBiStream* SayHelloBDSStream = nullptr;
+		SayHelloBDSSvrBiStream* SayHelloBDSStream = nullptr;
 		void ClientSayHelloBDS(HelloReply& response) { if (SayHelloBDSStream) SayHelloBDSStream->Send(response); }
 
 	public:
@@ -282,7 +268,7 @@ public:
 	RpcClientSession* GetClient(grpc::CallbackServerContext* context)
 	{
 		std::string id;
-		if (!TryFindContextMetaData(context, "Id", id))
+		if (!TryFindContextMetaData(context, "id", id))
 			return nullptr;
 		return GetClient(id);
 	}
@@ -307,7 +293,7 @@ protected:
 public:
 	grpc::ServerBidiReactor<HelloRequest, HelloReply>* SayHelloBDS(grpc::CallbackServerContext* context) override 
 	{
-		auto stream = new SayHelloBDSBiStream(context, _jobQueue,
+		auto stream = new SayHelloBDSSvrBiStream(context, _jobQueue,
 			[this](grpc::CallbackServerContext* ctx, const HelloRequest* req, std::any s) {
 				GetInstance()->ServerSayHelloBDS(ctx, req, s);
 			});
@@ -328,7 +314,7 @@ protected:
 public:
 	grpc::ServerWriteReactor<HelloReply>* SayHelloStreamReply(grpc::CallbackServerContext* context, const HelloRequest* request) override
 	{
-		auto stream = new SayHelloStreamReplyWriter(context);
+		auto stream = new SayHelloStreamReplySvrWriter(context);
 		auto* call = new RpcJob<HelloRequest>();
 		call->data = std::make_unique<HelloRequest>(*request);
 		call->stream = stream;

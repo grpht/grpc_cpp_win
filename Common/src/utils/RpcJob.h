@@ -69,6 +69,8 @@ public:
                 return;
             response->execute(response->data.get(), response->stream);
             delete response;
+
+            std::cout << "jobQ Size : " << _q.size() << std::endl;
         }
     }
 private:

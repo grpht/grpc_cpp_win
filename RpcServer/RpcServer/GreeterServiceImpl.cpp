@@ -2,9 +2,6 @@
 
 using namespace std;
 
-#define GET_BISTREAM(FUNC, stream) std::any_cast<FUNC##BiStream*>(stream)
-#define GET_STREAM_WRITER(FUNC, stream) std::any_cast<FUNC##Writer*>(stream)
-
 GreeterService* GreeterServiceImpl::GetInstance()
 {
 	return this;
@@ -38,7 +35,7 @@ void GreeterServiceImpl::ServerSayHelloBDS(grpc::CallbackServerContext* context,
 void GreeterServiceImpl::ServerSayHelloStreamReply(grpc::CallbackServerContext* context, const HelloRequest* request, std::any stream)
 {
 	cout << "ServerSayHelloStreamReply" << endl;
-	if (auto s = GET_STREAM_WRITER(SayHelloStreamReply, stream))
+	if (auto s = CAST_SERVER_WRITER(SayHelloStreamReply, stream))
 	{
 		for (int i = 0; i < 10000; ++i)
 		{

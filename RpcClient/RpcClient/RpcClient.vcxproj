@@ -131,16 +131,17 @@
   <ItemGroup>
     <ClCompile Include="..\..\Common\src\models\greeter.grpc.pb.cc" />
     <ClCompile Include="..\..\Common\src\models\greeter.pb.cc" />
-    <ClCompile Include="GreeterClient.cpp" />
-    <ClCompile Include="GreeterClientImpl.cpp" />
+    <ClCompile Include="GreeterServiceClientImpl.cpp" />
     <ClCompile Include="RpcClient.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Common\src\models\greeter.grpc.pb.h" />
     <ClInclude Include="..\..\Common\src\models\greeter.pb.h" />
     <ClInclude Include="..\..\Common\src\utils\RpcJob.h" />
-    <ClInclude Include="GreeterClient.h" />
-    <ClInclude Include="GreeterClientImpl.h" />
+    <ClInclude Include="..\..\Common\src\utils\RpcTemplate.h" />
+    <ClInclude Include="GreeterServiceClient.h" />
+    <ClInclude Include="GreeterServiceClientImpl.h" />
+    <ClInclude Include="RpcServiceClient.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

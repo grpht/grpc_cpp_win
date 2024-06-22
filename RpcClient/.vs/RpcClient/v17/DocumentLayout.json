@@ -3,24 +3,33 @@
   "WorkspaceRootPath": "E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{F4B02CD6-5F0C-462F-BB45-5A0D8C10E895}|RpcClient\\RpcClient.vcxproj|E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\GreeterClientImpl.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{F4B02CD6-5F0C-462F-BB45-5A0D8C10E895}|RpcClient\\RpcClient.vcxproj|solutionrelative:RpcClient\\GreeterClientImpl.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{F4B02CD6-5F0C-462F-BB45-5A0D8C10E895}|RpcClient\\RpcClient.vcxproj|E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\Common\\src\\utils\\RpcTemplate.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{F4B02CD6-5F0C-462F-BB45-5A0D8C10E895}|RpcClient\\RpcClient.vcxproj|E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\GreeterClientImpl.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{F4B02CD6-5F0C-462F-BB45-5A0D8C10E895}|RpcClient\\RpcClient.vcxproj|solutionrelative:RpcClient\\GreeterClientImpl.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{F4B02CD6-5F0C-462F-BB45-5A0D8C10E895}|RpcClient\\RpcClient.vcxproj|E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\GreeterClient.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{F4B02CD6-5F0C-462F-BB45-5A0D8C10E895}|RpcClient\\RpcClient.vcxproj|solutionrelative:RpcClient\\GreeterClient.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{F4B02CD6-5F0C-462F-BB45-5A0D8C10E895}|RpcClient\\RpcClient.vcxproj|E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\GreeterClient.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{F4B02CD6-5F0C-462F-BB45-5A0D8C10E895}|RpcClient\\RpcClient.vcxproj|solutionrelative:RpcClient\\GreeterClient.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{F4B02CD6-5F0C-462F-BB45-5A0D8C10E895}|RpcClient\\RpcClient.vcxproj|E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\GreeterServiceClient.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{F4B02CD6-5F0C-462F-BB45-5A0D8C10E895}|RpcClient\\RpcClient.vcxproj|solutionrelative:RpcClient\\GreeterServiceClient.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{F4B02CD6-5F0C-462F-BB45-5A0D8C10E895}|RpcClient\\RpcClient.vcxproj|E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\RpcClient.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{F4B02CD6-5F0C-462F-BB45-5A0D8C10E895}|RpcClient\\RpcClient.vcxproj|solutionrelative:RpcClient\\RpcClient.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F4B02CD6-5F0C-462F-BB45-5A0D8C10E895}|RpcClient\\RpcClient.vcxproj|E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\RpcServiceClient.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{F4B02CD6-5F0C-462F-BB45-5A0D8C10E895}|RpcClient\\RpcClient.vcxproj|solutionrelative:RpcClient\\RpcServiceClient.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F4B02CD6-5F0C-462F-BB45-5A0D8C10E895}|RpcClient\\RpcClient.vcxproj|E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\GreeterServiceClientImpl.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{F4B02CD6-5F0C-462F-BB45-5A0D8C10E895}|RpcClient\\RpcClient.vcxproj|solutionrelative:RpcClient\\GreeterServiceClientImpl.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F4B02CD6-5F0C-462F-BB45-5A0D8C10E895}|RpcClient\\RpcClient.vcxproj|E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\GreeterServiceClientImpl.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{F4B02CD6-5F0C-462F-BB45-5A0D8C10E895}|RpcClient\\RpcClient.vcxproj|solutionrelative:RpcClient\\GreeterServiceClientImpl.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F4B02CD6-5F0C-462F-BB45-5A0D8C10E895}|RpcClient\\RpcClient.vcxproj|C:\\DEV\\VCPKG\\INSTALLED\\X64-WINDOWS\\INCLUDE\\GRPCPP\\SECURITY\\CREDENTIALS.H||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F4B02CD6-5F0C-462F-BB45-5A0D8C10E895}|RpcClient\\RpcClient.vcxproj|E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\Common\\src\\utils\\RpcJob.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -30,7 +39,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 11,
+          "SelectedChildIndex": 13,
           "Children": [
             {
               "$type": "Bookmark",
@@ -78,65 +87,102 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "credentials.h",
+              "DocumentMoniker": "C:\\dev\\vcpkg\\installed\\x64-windows\\include\\grpcpp\\security\\credentials.h",
+              "ToolTip": "C:\\dev\\vcpkg\\installed\\x64-windows\\include\\grpcpp\\security\\credentials.h",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABUAAAAOAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2024-06-22T16:59:07.946Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "RpcServiceClient.h",
+              "DocumentMoniker": "E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\RpcServiceClient.h",
+              "RelativeDocumentMoniker": "RpcClient\\RpcServiceClient.h",
+              "ToolTip": "E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\RpcServiceClient.h",
+              "RelativeToolTip": "RpcClient\\RpcServiceClient.h",
+              "ViewState": "AQIAABMAAAAAAAAAAAAawEYAAAAKAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2024-06-22T15:18:16.226Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "GreeterClientImpl.h",
-              "DocumentMoniker": "E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\GreeterClientImpl.h",
-              "RelativeDocumentMoniker": "RpcClient\\GreeterClientImpl.h",
-              "ToolTip": "E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\GreeterClientImpl.h",
-              "RelativeToolTip": "RpcClient\\GreeterClientImpl.h",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAEAAAAAAAAA",
+              "Title": "RpcTemplate.h",
+              "DocumentMoniker": "E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\Common\\src\\utils\\RpcTemplate.h",
+              "RelativeDocumentMoniker": "..\\Common\\src\\utils\\RpcTemplate.h",
+              "ToolTip": "E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\Common\\src\\utils\\RpcTemplate.h",
+              "RelativeToolTip": "..\\Common\\src\\utils\\RpcTemplate.h",
+              "ViewState": "AQIAAD4AAAAAAAAAAAAxwFMAAAApAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2024-06-22T15:03:16.521Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "RpcJob.h",
+              "DocumentMoniker": "E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\Common\\src\\utils\\RpcJob.h",
+              "RelativeDocumentMoniker": "..\\Common\\src\\utils\\RpcJob.h",
+              "ToolTip": "E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\Common\\src\\utils\\RpcJob.h",
+              "RelativeToolTip": "..\\Common\\src\\utils\\RpcJob.h",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2024-06-22T15:01:42.657Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "GreeterServiceClientImpl.h",
+              "DocumentMoniker": "E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\GreeterServiceClientImpl.h",
+              "RelativeDocumentMoniker": "RpcClient\\GreeterServiceClientImpl.h",
+              "ToolTip": "E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\GreeterServiceClientImpl.h",
+              "RelativeToolTip": "RpcClient\\GreeterServiceClientImpl.h",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAA4AAAACAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
               "WhenOpened": "2024-06-22T04:21:54.431Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "GreeterClientImpl.cpp",
-              "DocumentMoniker": "E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\GreeterClientImpl.cpp",
-              "RelativeDocumentMoniker": "RpcClient\\GreeterClientImpl.cpp",
-              "ToolTip": "E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\GreeterClientImpl.cpp",
-              "RelativeToolTip": "RpcClient\\GreeterClientImpl.cpp",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "DocumentIndex": 5,
+              "Title": "GreeterServiceClientImpl.cpp",
+              "DocumentMoniker": "E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\GreeterServiceClientImpl.cpp",
+              "RelativeDocumentMoniker": "RpcClient\\GreeterServiceClientImpl.cpp",
+              "ToolTip": "E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\GreeterServiceClientImpl.cpp",
+              "RelativeToolTip": "RpcClient\\GreeterServiceClientImpl.cpp",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAA4AAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2024-06-22T04:21:37.656Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "GreeterClient.cpp",
-              "DocumentMoniker": "E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\GreeterClient.cpp",
-              "RelativeDocumentMoniker": "RpcClient\\GreeterClient.cpp",
-              "ToolTip": "E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\GreeterClient.cpp",
-              "RelativeToolTip": "RpcClient\\GreeterClient.cpp",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2024-06-22T04:21:01.727Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "GreeterClient.h",
-              "DocumentMoniker": "E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\GreeterClient.h",
-              "RelativeDocumentMoniker": "RpcClient\\GreeterClient.h",
-              "ToolTip": "E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\GreeterClient.h",
-              "RelativeToolTip": "RpcClient\\GreeterClient.h",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "DocumentIndex": 1,
+              "Title": "GreeterServiceClient.h",
+              "DocumentMoniker": "E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\GreeterServiceClient.h",
+              "RelativeDocumentMoniker": "RpcClient\\GreeterServiceClient.h",
+              "ToolTip": "E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\GreeterServiceClient.h",
+              "RelativeToolTip": "RpcClient\\GreeterServiceClient.h",
+              "ViewState": "AQIAACgAAAAAAAAAAAAhwDEAAAADAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
               "WhenOpened": "2024-06-22T04:20:36.224Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 2,
               "Title": "RpcClient.cpp",
               "DocumentMoniker": "E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\RpcClient.cpp",
               "RelativeDocumentMoniker": "RpcClient\\RpcClient.cpp",
               "ToolTip": "E:\\01_Programing\\08_Cpp\\workspace\\gRPC\\RpcClient\\RpcClient\\RpcClient.cpp",
               "RelativeToolTip": "RpcClient\\RpcClient.cpp",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAkAAAAAAAAA",
+              "ViewState": "AQIAAAwAAAAAAAAAAAAAABgAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2024-06-21T16:51:35.183Z",
               "EditorCaption": ""

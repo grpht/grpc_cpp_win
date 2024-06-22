@@ -131,7 +131,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\Common\src\models\greeter.grpc.pb.cc" />
     <ClCompile Include="..\..\Common\src\models\greeter.pb.cc" />
-    <ClCompile Include="GreeterService.cpp" />
     <ClCompile Include="GreeterServiceImpl.cpp" />
     <ClCompile Include="RpcServer.cpp" />
   </ItemGroup>

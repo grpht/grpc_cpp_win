@@ -13,10 +13,54 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="소스 파일\models">
+      <UniqueIdentifier>{b7b853db-fe2e-4315-813c-d220269a86c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\utils">
+      <UniqueIdentifier>{6ff226d3-ee89-4cc3-99e0-3f76cec61d55}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RpcServer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="GreeterService.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\src\models\greeter.grpc.pb.cc">
+      <Filter>소스 파일\models</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\src\models\greeter.pb.cc">
+      <Filter>소스 파일\models</Filter>
+    </ClCompile>
+    <ClCompile Include="GreeterServiceImpl.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GreeterService.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\src\models\greeter.grpc.pb.h">
+      <Filter>소스 파일\models</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\src\models\greeter.pb.h">
+      <Filter>소스 파일\models</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\src\utils\RpcJob.h">
+      <Filter>소스 파일\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="GreeterServiceImpl.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\src\utils\RpcTemplate.h">
+      <Filter>소스 파일\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="RpcService.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="RpcServer.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -15,8 +15,14 @@
 *.gch
 *.pch
 *.ipch
+
+# Visual Studio
 *.vcxproj.user
-*.opendb
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb
+*.cachefile
 
 # Compiled Dynamic libraries
 *.so
@@ -37,5 +43,39 @@
 *.exe
 *.out
 *.app
+
+# Build Folder
+bin/
+obj/
+Debug/
+Release/
+x64/Debug/
+x64/Release/
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+CMakeScripts/
+CTestTestfile.cmake
+cmake_install.cmake
+Makefile
+
+# temporay
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+*.directory
+.DS_Store
+
+# System
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# act
+.vscode/
+*.code-workspace
 
 # End of https://www.toptal.com/developers/gitignore/api/c++

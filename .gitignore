@@ -69,6 +69,11 @@ Makefile
 *.directory
 .DS_Store
 
+# Auto-generated files
+*.vsidx
+RpcClient/.vs/
+RpcServer/.vs/
+
 # System
 Thumbs.db
 ehthumbs.db

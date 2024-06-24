@@ -49,9 +49,14 @@ int main(int argc, char* argv[])
     client.Connect("localhost", 9999);
 
     //test
-    std::thread testUnary = std::thread(TestBiStream, &client);
+    std::thread testUnary = std::thread(TestUnary, &client);
+    std::thread testBistream = std::thread(TestBiStream, &client);
+    std::thread testServerStream = std::thread(TestServerStream, &client);
 
     testUnary.join();
+    testBistream.join();
+    testServerStream.join();
+
     unaryCallbackThread.join();
     flushThread.join();
     return 0;

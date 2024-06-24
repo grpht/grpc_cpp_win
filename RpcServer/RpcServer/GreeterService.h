@@ -133,7 +133,10 @@ private: \
 	std::shared_ptr<FUNC##Writer> mThis; \
 }; \
 
-class SayHelloBDSSvrBiStream : public grpc::ServerBidiReactor<HelloRequest, HelloReply> {
+class SayHelloBDSSvrBiStream
+	: public grpc::ServerBidiReactor<HelloRequest, HelloReply>
+	, public std::enable_shared_from_this<SayHelloBDSSvrBiStream>
+{
 public:
 	SayHelloBDSSvrBiStream(grpc::CallbackServerContext* context, RpcJobQueue<RpcJobBase>* jobQ, std::function<void(grpc::CallbackServerContext*, const HelloRequest*, std::any stream)> callback)
 		:_context(context), _jobQueue(jobQ), _callback(callback)
@@ -141,12 +144,12 @@ public:
 		StartRead(&_request);
 	}
 	void SetId(std::string& id) { if (_id.empty()) _id = id; }
-
+	void SetPtr(std::shared_ptr< SayHelloBDSSvrBiStream> ptr) { _ptr = ptr; }
 	void OnReadDone(bool ok) override {
 		if (!ok) { Finish(grpc::Status::OK); return; }
 		auto* call = new RpcJob<HelloRequest>();
 		call->data = std::make_unique<HelloRequest>(_request);
-		call->stream = this;
+		call->stream = shared_from_this();
 		call->execute = [this](google::protobuf::Message* message, std::any stream) {
 			auto* castedMessage = static_cast<HelloRequest*>(message);
 			this->_callback(_context, castedMessage, stream);
@@ -154,7 +157,7 @@ public:
 		_jobQueue->Push(call);
 		StartRead(&_request);
 	}
-	void OnDone() override { }
+	void OnDone() override { _ptr = nullptr; }
 	void Send(HelloReply& message) {
 		auto response = std::make_unique<HelloReply>(); response->CopyFrom(message);
 		if (!_sending.exchange(true)) {
@@ -172,16 +175,20 @@ public:
 		if (!ok) {
 			std::cerr << "Server Write Error" << std::endl;
 			Finish(grpc::Status::OK); return;
-		} if (!_pendingSend.empty()) {
+		}
+		
+		if (!_pendingSend.empty()) {
 			{
 				std::lock_guard<std::mutex> lock(_mu); _currentSending = std::move(_pendingSend.front()); _pendingSend.pop();
 			} StartWrite(_currentSending.get());
 		}
 		else {
-			_currentSending = nullptr; _sending.store(false);
+			_currentSending = nullptr;
+			_sending.store(false);
 		}
 	}
-private: 
+private:
+	std::shared_ptr<SayHelloBDSSvrBiStream> _ptr;
 	grpc::CallbackServerContext* _context = nullptr; 
 	std::string _id; std::atomic<bool> _sending = false; 
 	std::queue<std::unique_ptr<HelloReply>> _pendingSend;
@@ -191,7 +198,9 @@ private:
 	std::function<void(grpc::CallbackServerContext*, const HelloRequest*, std::any stream)> _callback;
 };
 
-class SayHelloStreamReplySvrWriter : public grpc::ServerWriteReactor<HelloReply>
+class SayHelloStreamReplySvrWriter
+	: public grpc::ServerWriteReactor<HelloReply>
+	, public std::enable_shared_from_this<SayHelloStreamReplySvrWriter>
 {
 public:
 	SayHelloStreamReplySvrWriter(grpc::CallbackServerContext* context)
@@ -202,6 +211,7 @@ public:
 	{
 		if (_id.empty()) _id = id;
 	}
+	void SetPtr(std::shared_ptr<SayHelloStreamReplySvrWriter> ptr) { _ptr = ptr; }
 	void Send(HelloReply& message) {
 		auto response = std::make_unique<HelloReply>(); 
 		response->CopyFrom(message);
@@ -219,7 +229,9 @@ public:
 			_pendingSend.push(std::move(response));
 		}
 	}
-	void OnDone() override {
+	void OnDone() override
+	{
+		_ptr = nullptr;
 	}
 	void OnWriteDone(bool ok) override {
 		if (!ok) {
@@ -237,6 +249,7 @@ public:
 		}
 	}
 private:
+	std::shared_ptr<SayHelloStreamReplySvrWriter> _ptr;
 	grpc::CallbackServerContext* _context = nullptr;
 	std::string _id;
 	std::atomic<bool> _sending = false;

@@ -22,7 +22,7 @@ void TestUnary(GreeterServiceClientImpl* greeter)
 
 void TestBiStream(GreeterServiceClientImpl* greeter)
 {
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < 5000; i++) {
         std::string user("bidistream " + std::to_string(i));
         HelloRequest request;
         request.set_name(user);
@@ -49,12 +49,12 @@ int main(int argc, char* argv[])
     client.Connect("localhost", 9999);
 
     //test
-    std::thread testUnary = std::thread(TestUnary, &client);
-    std::thread testBistream = std::thread(TestBiStream, &client);
+    //std::thread testUnary = std::thread(TestUnary, &client);
+    //std::thread testBistream = std::thread(TestBiStream, &client);
     std::thread testServerStream = std::thread(TestServerStream, &client);
 
-    testUnary.join();
-    testBistream.join();
+    //testUnary.join();
+    //testBistream.join();
     testServerStream.join();
 
     unaryCallbackThread.join();

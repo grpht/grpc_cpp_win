@@ -131,12 +131,14 @@
   <ItemGroup>
     <ClCompile Include="..\..\Common\src\models\greeter.grpc.pb.cc" />
     <ClCompile Include="..\..\Common\src\models\greeter.pb.cc" />
+    <ClCompile Include="..\..\Common\src\utils\ManualResetEventSlim.cpp" />
     <ClCompile Include="GreeterServiceClientImpl.cpp" />
     <ClCompile Include="RpcClient.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Common\src\models\greeter.grpc.pb.h" />
     <ClInclude Include="..\..\Common\src\models\greeter.pb.h" />
+    <ClInclude Include="..\..\Common\src\utils\ManualResetEventSlim.h" />
     <ClInclude Include="..\..\Common\src\utils\RpcJob.h" />
     <ClInclude Include="..\..\Common\src\utils\RpcTemplate.h" />
     <ClInclude Include="GreeterServiceClient.h" />

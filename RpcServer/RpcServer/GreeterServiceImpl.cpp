@@ -37,7 +37,7 @@ void GreeterServiceImpl::ServerSayHelloStreamReply(grpc::CallbackServerContext* 
 	cout << "ServerSayHelloStreamReply" << endl;
 	if (auto s = CAST_SERVER_WRITER(SayHelloStreamReply, stream))
 	{
-		for (int i = 0; i < 10000; ++i)
+		for (int i = 0; i < 5000; ++i)
 		{
 			HelloReply response;
 			response.set_message(request->name() + "hi" + to_string(i));

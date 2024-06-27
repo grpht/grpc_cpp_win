@@ -33,6 +33,9 @@
     <ClCompile Include="GreeterServiceClientImpl.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Common\src\utils\ManualResetEventSlim.cpp">
+      <Filter>소스 파일\utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Common\src\utils\RpcJob.h">
@@ -55,6 +58,9 @@
     </ClInclude>
     <ClInclude Include="RpcServiceClient.h">
       <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\src\utils\ManualResetEventSlim.h">
+      <Filter>소스 파일\utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -12,4 +12,7 @@ class GreeterServiceClientImpl : public GreeterServiceClient
 	void ClientSayHelloStreamReply(const HelloReply* response, std::any stream) override;
 	void OnDoneSayHelloStreamReply(const::grpc::Status& status) override;
 	void OnSayHello(const helloworld::HelloReply* response) override;
+
+	// GreeterServiceClient을(를) 통해 상속됨
+	void OnDoneSayHelloRecord(HelloReply* reponse, const grpc::Status& status) override;
 };

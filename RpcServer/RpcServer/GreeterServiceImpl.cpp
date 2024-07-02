@@ -47,3 +47,17 @@ void GreeterServiceImpl::ServerSayHelloStreamReply(grpc::CallbackServerContext* 
 		s->Finish(grpc::Status::OK);
 	}
 }
+
+void GreeterServiceImpl::ServerSayHelloRecord(grpc::CallbackServerContext* context, const HelloRequest* request, std::any stream)
+{
+	if (auto s = std::any_cast<std::shared_ptr<SayHelloRecordSvrReader>>(stream))
+	{
+		cout << "ServerSayHelloRecord : " << request->name() << endl;
+	}
+}
+
+grpc::Status GreeterServiceImpl::FinishServerSayHelloRecord(HelloReply* response, std::shared_ptr<SayHelloRecordSvrReader> stream)
+{
+	response->set_message("Receive OK");
+	return grpc::Status::OK;
+}

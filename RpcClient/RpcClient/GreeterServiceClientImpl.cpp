@@ -13,6 +13,10 @@ void GreeterServiceClientImpl::OnSayHello(const helloworld::HelloReply* response
 	cout << response->message() << endl;
 }
 
+void GreeterServiceClientImpl::OnDoneSayHelloRecord(HelloReply* reponse, const grpc::Status& status)
+{
+}
+
 
 void GreeterServiceClientImpl::ClientSayHelloBDS(const HelloReply* response, std::any stream)
 {

@@ -8,6 +8,8 @@ service Greeter {
   rpc SayHelloStreamReply (HelloRequest) returns (stream HelloReply) {}
 
   rpc SayHelloBDS (stream HelloRequest) returns (stream HelloReply) {}
+
+  rpc SayHelloRecord (stream HelloRequest) returns (HelloReply) {}
 }
 
 message HelloRequest {

@@ -25,6 +25,7 @@ static const char* Greeter_method_names[] = {
   "/helloworld.Greeter/SayHello",
   "/helloworld.Greeter/SayHelloStreamReply",
   "/helloworld.Greeter/SayHelloBDS",
+  "/helloworld.Greeter/SayHelloRecord",
 };
 
 std::unique_ptr< Greeter::Stub> Greeter::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -37,6 +38,7 @@ Greeter::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, c
   : channel_(channel), rpcmethod_SayHello_(Greeter_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_SayHelloStreamReply_(Greeter_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::SERVER_STREAMING, channel)
   , rpcmethod_SayHelloBDS_(Greeter_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::BIDI_STREAMING, channel)
+  , rpcmethod_SayHelloRecord_(Greeter_method_names[3], options.suffix_for_stats(),::grpc::internal::RpcMethod::CLIENT_STREAMING, channel)
   {}
 
 ::grpc::Status Greeter::Stub::SayHello(::grpc::ClientContext* context, const ::helloworld::HelloRequest& request, ::helloworld::HelloReply* response) {
@@ -94,6 +96,22 @@ void Greeter::Stub::async::SayHelloBDS(::grpc::ClientContext* context, ::grpc::C
   return ::grpc::internal::ClientAsyncReaderWriterFactory< ::helloworld::HelloRequest, ::helloworld::HelloReply>::Create(channel_.get(), cq, rpcmethod_SayHelloBDS_, context, false, nullptr);
 }
 
+::grpc::ClientWriter< ::helloworld::HelloRequest>* Greeter::Stub::SayHelloRecordRaw(::grpc::ClientContext* context, ::helloworld::HelloReply* response) {
+  return ::grpc::internal::ClientWriterFactory< ::helloworld::HelloRequest>::Create(channel_.get(), rpcmethod_SayHelloRecord_, context, response);
+}
+
+void Greeter::Stub::async::SayHelloRecord(::grpc::ClientContext* context, ::helloworld::HelloReply* response, ::grpc::ClientWriteReactor< ::helloworld::HelloRequest>* reactor) {
+  ::grpc::internal::ClientCallbackWriterFactory< ::helloworld::HelloRequest>::Create(stub_->channel_.get(), stub_->rpcmethod_SayHelloRecord_, context, response, reactor);
+}
+
+::grpc::ClientAsyncWriter< ::helloworld::HelloRequest>* Greeter::Stub::AsyncSayHelloRecordRaw(::grpc::ClientContext* context, ::helloworld::HelloReply* response, ::grpc::CompletionQueue* cq, void* tag) {
+  return ::grpc::internal::ClientAsyncWriterFactory< ::helloworld::HelloRequest>::Create(channel_.get(), cq, rpcmethod_SayHelloRecord_, context, response, true, tag);
+}
+
+::grpc::ClientAsyncWriter< ::helloworld::HelloRequest>* Greeter::Stub::PrepareAsyncSayHelloRecordRaw(::grpc::ClientContext* context, ::helloworld::HelloReply* response, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncWriterFactory< ::helloworld::HelloRequest>::Create(channel_.get(), cq, rpcmethod_SayHelloRecord_, context, response, false, nullptr);
+}
+
 Greeter::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       Greeter_method_names[0],
@@ -125,6 +143,16 @@ Greeter::Service::Service() {
              ::helloworld::HelloRequest>* stream) {
                return service->SayHelloBDS(ctx, stream);
              }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      Greeter_method_names[3],
+      ::grpc::internal::RpcMethod::CLIENT_STREAMING,
+      new ::grpc::internal::ClientStreamingHandler< Greeter::Service, ::helloworld::HelloRequest, ::helloworld::HelloReply>(
+          [](Greeter::Service* service,
+             ::grpc::ServerContext* ctx,
+             ::grpc::ServerReader<::helloworld::HelloRequest>* reader,
+             ::helloworld::HelloReply* resp) {
+               return service->SayHelloRecord(ctx, reader, resp);
+             }, this)));
 }
 
 Greeter::Service::~Service() {
@@ -147,6 +175,13 @@ Greeter::Service::~Service() {
 ::grpc::Status Greeter::Service::SayHelloBDS(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::helloworld::HelloReply, ::helloworld::HelloRequest>* stream) {
   (void) context;
   (void) stream;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status Greeter::Service::SayHelloRecord(::grpc::ServerContext* context, ::grpc::ServerReader< ::helloworld::HelloRequest>* reader, ::helloworld::HelloReply* response) {
+  (void) context;
+  (void) reader;
+  (void) response;
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 

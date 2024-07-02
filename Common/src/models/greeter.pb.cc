@@ -81,16 +81,18 @@ static const ::_pb::Message* const file_default_instances[] = {
 const char descriptor_table_protodef_greeter_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\rgreeter.proto\022\nhelloworld\"\034\n\014HelloRequ"
   "est\022\014\n\004name\030\001 \001(\t\"\035\n\nHelloReply\022\017\n\007messa"
-  "ge\030\001 \001(\t2\335\001\n\007Greeter\022>\n\010SayHello\022\030.hello"
+  "ge\030\001 \001(\t2\245\002\n\007Greeter\022>\n\010SayHello\022\030.hello"
   "world.HelloRequest\032\026.helloworld.HelloRep"
   "ly\"\000\022K\n\023SayHelloStreamReply\022\030.helloworld"
   ".HelloRequest\032\026.helloworld.HelloReply\"\0000"
   "\001\022E\n\013SayHelloBDS\022\030.helloworld.HelloReque"
-  "st\032\026.helloworld.HelloReply\"\000(\0010\001b\006proto3"
+  "st\032\026.helloworld.HelloReply\"\000(\0010\001\022F\n\016SayH"
+  "elloRecord\022\030.helloworld.HelloRequest\032\026.h"
+  "elloworld.HelloReply\"\000(\001b\006proto3"
   ;
 static ::_pbi::once_flag descriptor_table_greeter_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_greeter_2eproto = {
-    false, false, 320, descriptor_table_protodef_greeter_2eproto,
+    false, false, 392, descriptor_table_protodef_greeter_2eproto,
     "greeter.proto",
     &descriptor_table_greeter_2eproto_once, nullptr, 0, 2,
     schemas, file_default_instances, TableStruct_greeter_2eproto::offsets,

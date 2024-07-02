@@ -220,7 +220,7 @@ private:
 	std::mutex _mu; 
 	
 	HelloRequest _readMessage; 
-	RpcJobQueue<RpcJobBase>* _jobQueue;
+	RpcJobQueue<RpcJobBase>* _jobQueue = nullptr;
 	std::function<void(grpc::CallbackServerContext*, const HelloRequest*, std::any stream)> _readCallback;
 };
 
@@ -303,6 +303,62 @@ private:
 	std::mutex _mu;
 };
 
+class SayHelloRecordSvrReader
+	: public grpc::ServerReadReactor<HelloRequest>
+	, public std::enable_shared_from_this<SayHelloRecordSvrReader>
+{
+public:
+	SayHelloRecordSvrReader(grpc::CallbackServerContext* context, HelloReply* response)
+	{
+		_context = context;
+		_response = response;
+	}
+
+	void SetId(std::string& id) { if (_id.empty()) _id = id; }
+	void SetPtr(std::shared_ptr< SayHelloRecordSvrReader> ptr) { _ptr = ptr; }
+
+	void RegisterDone(std::function<void(SayHelloRecordSvrReader*, const grpc::Status&)> doneCallback)
+	{ _doneCallback = doneCallback; }
+	void OnDone() override {
+		_done.store(true);
+		if (_doneCallback) _doneCallback(this, grpc::Status::OK);
+		_ptr = nullptr;
+	}
+	bool IsDone() { return _done.load(); }
+
+	void RegisterRead(RpcJobQueue<RpcJobBase>* jobQ, std::function<void(grpc::CallbackServerContext*, const HelloRequest*, std::any stream, bool)> readCallback)
+	{
+		_jobQueue = jobQ;
+		_readCallback = readCallback;
+		StartRead(&_readMessage);
+	}
+
+	void OnReadDone(bool ok) override {
+		auto* call = new RpcJob<HelloRequest>();
+		call->data = std::make_unique<HelloRequest>(_readMessage);
+		call->stream = shared_from_this();
+		call->execute = [this, ok](google::protobuf::Message* message, std::any stream) {
+			auto* castedMessage = static_cast<HelloRequest*>(message);
+			this->_readCallback(_context, castedMessage, stream, ok);
+			};
+		_jobQueue->Push(call);
+		if (ok) StartRead(&_readMessage);
+	}
+private:
+	std::string _id;
+	grpc::CallbackServerContext* _context = nullptr;
+	std::shared_ptr<SayHelloRecordSvrReader> _ptr = nullptr;
+
+	std::atomic_bool _done = false;
+	std::function<void(SayHelloRecordSvrReader*, const grpc::Status& status)> _doneCallback;
+
+	HelloRequest _readMessage;
+	RpcJobQueue<RpcJobBase>* _jobQueue = nullptr;
+	std::function<void(grpc::CallbackServerContext*, const HelloRequest*, std::any, bool)> _readCallback;
+
+	HelloReply* _response = nullptr;
+};
+
 class GreeterService : public helloworld::Greeter::CallbackService, public RpcService
 {
 protected:
@@ -314,6 +370,7 @@ protected:
 		std::shared_ptr<SayHelloBDSSvrBiStream> SayHelloBDSStream = nullptr;
 		void ClientSayHelloBDS(HelloReply& response) { if (SayHelloBDSStream) SayHelloBDSStream->Send(response); }
 
+		std::shared_ptr<SayHelloRecordSvrReader> SayHelloRecordPtr = nullptr;
 	public:
 		void SetId(const std::string& id) { if (_id.empty()) _id = id; }
 		const std::string& GetId() const { return _id; }
@@ -384,6 +441,29 @@ public:
 				this->ServerSayHelloStreamReply(context, castdMessage, s);
 			};
 		_jobQueue->Push(call);
+		return stream.get();
+	}
+
+protected:
+	virtual void ServerSayHelloRecord(grpc::CallbackServerContext* context, const HelloRequest* request, std::any stream) = 0;
+	virtual grpc::Status FinishServerSayHelloRecord(HelloReply* response, std::shared_ptr<SayHelloRecordSvrReader> stream) = 0;
+public:
+	grpc::ServerReadReactor<HelloRequest>* SayHelloRecord(grpc::CallbackServerContext* context, HelloReply* response) override {
+		auto stream = std::make_shared<SayHelloRecordSvrReader>(context, response);
+		stream->SetPtr(stream);
+		stream->RegisterRead(_jobQueue, [response, stream, this](grpc::CallbackServerContext* ctx, const HelloRequest* request, std::any s, bool ok) {
+			if (!ok)
+				stream->Finish(FinishServerSayHelloRecord(response, stream));
+			else
+				ServerSayHelloRecord(ctx, request, s);
+			});
+		std::string id;
+		if (TryFindContextMetaData(context, "id", id))
+		{
+			auto& client = _clients[id];
+			client.SetId(id);
+			client.SayHelloRecordPtr = stream;
+		}
 		return stream.get();
 	}
 };

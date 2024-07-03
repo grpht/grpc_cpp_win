@@ -31,7 +31,6 @@ public:
 		channelArgs.SetInt(GRPC_ARG_KEEPALIVE_PERMIT_WITHOUT_CALLS, 1);
 		_channel = grpc::CreateCustomChannel(address, grpc::InsecureChannelCredentials(), channelArgs);
 		InitStub(_channel);
-		RegisterStream();
 		OnAfterConnected();
 	}
 
@@ -64,7 +63,6 @@ public:
 	const std::string& GetId() const { return _id; }
 protected:
 	virtual void InitStub(std::shared_ptr<grpc::Channel> channel) = 0;
-	virtual void RegisterStream() {}
 	virtual void OnBeforeConnect() {}
 	virtual void OnAfterConnected() {}
 	

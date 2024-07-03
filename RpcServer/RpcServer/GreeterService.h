@@ -133,18 +133,18 @@ private: \
 	std::shared_ptr<FUNC##Writer> mThis; \
 }; \
 
-class SayHelloBDSSvrBiStream
+class SayHelloBDSSvrStream
 	: public grpc::ServerBidiReactor<HelloRequest, HelloReply>
-	, public std::enable_shared_from_this<SayHelloBDSSvrBiStream>
+	, public std::enable_shared_from_this<SayHelloBDSSvrStream>
 {
 public:
-	SayHelloBDSSvrBiStream(grpc::CallbackServerContext* context)
+	SayHelloBDSSvrStream(grpc::CallbackServerContext* context)
 		:_context(context)
 	{ }
 	void SetId(std::string& id) { if (_id.empty()) _id = id; }
-	void SetPtr(std::shared_ptr< SayHelloBDSSvrBiStream> ptr) { _ptr = ptr; }
+	void SetPtr(std::shared_ptr< SayHelloBDSSvrStream> ptr) { _ptr = ptr; }
 	
-	void RegisterDone(std::function<void(SayHelloBDSSvrBiStream*, const grpc::Status&)> doneCallback)
+	void RegisterDone(std::function<void(SayHelloBDSSvrStream*, const grpc::Status&)> doneCallback)
 	{ _doneCallback = doneCallback; }
 	void OnDone() override {
 		_done.store(true);
@@ -153,7 +153,11 @@ public:
 		_ptr = nullptr; 
 	}
 	bool IsDone() { return _done.load(); }
-
+	void Close(const grpc::Status& status)
+	{
+		if (!_close.exchange(true))
+			Finish(status);
+	}
 	void Send(HelloReply& message) {
 		if (_done.load()) return;
 		auto response = std::make_unique<HelloReply>(message);
@@ -193,7 +197,7 @@ public:
 	}
 	void OnReadDone(bool ok) override {
 		if (!ok) {
-			Finish(grpc::Status::OK);
+			Close(grpc::Status::OK);
 			return;
 		}
 		auto* call = new RpcJob<HelloRequest>();
@@ -209,11 +213,12 @@ public:
 private:
 	std::string _id;
 	grpc::CallbackServerContext* _context = nullptr;
-	std::shared_ptr<SayHelloBDSSvrBiStream> _ptr;
+	std::shared_ptr<SayHelloBDSSvrStream> _ptr;
 
 	std::atomic_bool _done = false;
-	std::function<void(SayHelloBDSSvrBiStream*, const grpc::Status& status)> _doneCallback;
-	
+	std::function<void(SayHelloBDSSvrStream*, const grpc::Status& status)> _doneCallback;
+	std::atomic_bool _close = false;
+
 	std::atomic<bool> _sending = false; 
 	std::queue<std::unique_ptr<HelloReply>> _pendingSend;
 	std::unique_ptr<HelloReply> _currentSending;
@@ -224,12 +229,12 @@ private:
 	std::function<void(grpc::CallbackServerContext*, const HelloRequest*, std::any stream)> _readCallback;
 };
 
-class SayHelloStreamReplySvrWriter
+class SayHelloStreamReplySvrStream
 	: public grpc::ServerWriteReactor<HelloReply>
-	, public std::enable_shared_from_this<SayHelloStreamReplySvrWriter>
+	, public std::enable_shared_from_this<SayHelloStreamReplySvrStream>
 {
 public:
-	SayHelloStreamReplySvrWriter(grpc::CallbackServerContext* context)
+	SayHelloStreamReplySvrStream(grpc::CallbackServerContext* context)
 		:_context(context) 
 	{
 	} 
@@ -237,9 +242,9 @@ public:
 	{
 		if (_id.empty()) _id = id;
 	}
-	void SetPtr(std::shared_ptr<SayHelloStreamReplySvrWriter> ptr) { _ptr = ptr; }
+	void SetPtr(std::shared_ptr<SayHelloStreamReplySvrStream> ptr) { _ptr = ptr; }
 	
-	void RegisterDone(std::function<void(SayHelloStreamReplySvrWriter*, const grpc::Status&)> doneCallback)
+	void RegisterDone(std::function<void(SayHelloStreamReplySvrStream*, const grpc::Status&)> doneCallback)
 	{
 		_doneCallback = doneCallback;
 	}
@@ -250,7 +255,11 @@ public:
 		TrashPendingSend();
 		_ptr = nullptr;
 	}
-
+	void Close(const grpc::Status& status)
+	{
+		if (!_close.exchange(true))
+			Finish(status);
+	}
 	void Send(HelloReply& message) {
 		if (_done) return;
 		auto response = std::make_unique<HelloReply>(); 
@@ -269,7 +278,7 @@ public:
 	
 	void OnWriteDone(bool ok) override {
 		if (!ok) {
-			Finish(grpc::Status(grpc::StatusCode::UNKNOWN, "Unexpected Failure"));
+			Close(grpc::Status(grpc::StatusCode::UNKNOWN, "Unexpected Failure"));
 			return;
 		}
 		std::lock_guard<std::mutex> lock(_mu);
@@ -292,32 +301,33 @@ public:
 private:
 	std::string _id;
 	grpc::CallbackServerContext* _context = nullptr;
-	std::shared_ptr<SayHelloStreamReplySvrWriter> _ptr;
+	std::shared_ptr<SayHelloStreamReplySvrStream> _ptr;
 
 	std::atomic_bool _done = false;
+	std::atomic_bool _close = false;
 
-	std::function<void(SayHelloStreamReplySvrWriter*, const grpc::Status&)> _doneCallback = nullptr;
+	std::function<void(SayHelloStreamReplySvrStream*, const grpc::Status&)> _doneCallback = nullptr;
 	std::atomic_bool _sending = false;
 	std::queue<std::unique_ptr<HelloReply>> _pendingSend;
 	std::unique_ptr<HelloReply> _currentSending;
 	std::mutex _mu;
 };
 
-class SayHelloRecordSvrReader
+class SayHelloRecordSvrStream
 	: public grpc::ServerReadReactor<HelloRequest>
-	, public std::enable_shared_from_this<SayHelloRecordSvrReader>
+	, public std::enable_shared_from_this<SayHelloRecordSvrStream>
 {
 public:
-	SayHelloRecordSvrReader(grpc::CallbackServerContext* context, HelloReply* response)
+	SayHelloRecordSvrStream(grpc::CallbackServerContext* context, HelloReply* response)
 	{
 		_context = context;
 		_response = response;
 	}
 
 	void SetId(std::string& id) { if (_id.empty()) _id = id; }
-	void SetPtr(std::shared_ptr< SayHelloRecordSvrReader> ptr) { _ptr = ptr; }
+	void SetPtr(std::shared_ptr< SayHelloRecordSvrStream> ptr) { _ptr = ptr; }
 
-	void RegisterDone(std::function<void(SayHelloRecordSvrReader*, const grpc::Status&)> doneCallback)
+	void RegisterDone(std::function<void(SayHelloRecordSvrStream*, const grpc::Status&)> doneCallback)
 	{ _doneCallback = doneCallback; }
 	void OnDone() override {
 		_done.store(true);
@@ -325,7 +335,11 @@ public:
 		_ptr = nullptr;
 	}
 	bool IsDone() { return _done.load(); }
-
+	void Close(const grpc::Status& status)
+	{
+		if (!_close.exchange(true))
+			Finish(status);
+	}
 	void RegisterRead(RpcJobQueue<RpcJobBase>* jobQ, std::function<void(grpc::CallbackServerContext*, const HelloRequest*, std::any stream, bool)> readCallback)
 	{
 		_jobQueue = jobQ;
@@ -347,10 +361,11 @@ public:
 private:
 	std::string _id;
 	grpc::CallbackServerContext* _context = nullptr;
-	std::shared_ptr<SayHelloRecordSvrReader> _ptr = nullptr;
+	std::shared_ptr<SayHelloRecordSvrStream> _ptr = nullptr;
 
 	std::atomic_bool _done = false;
-	std::function<void(SayHelloRecordSvrReader*, const grpc::Status& status)> _doneCallback;
+	std::function<void(SayHelloRecordSvrStream*, const grpc::Status& status)> _doneCallback;
+	std::atomic_bool _close = false;
 
 	HelloRequest _readMessage;
 	RpcJobQueue<RpcJobBase>* _jobQueue = nullptr;
@@ -367,10 +382,20 @@ protected:
 	class RpcClientSession
 	{
 	public:
-		std::shared_ptr<SayHelloBDSSvrBiStream> SayHelloBDSStream = nullptr;
+		//BiStream
+		std::shared_ptr<SayHelloBDSSvrStream> SayHelloBDSStream = nullptr;
 		void ClientSayHelloBDS(HelloReply& response) { if (SayHelloBDSStream) SayHelloBDSStream->Send(response); }
+		void CloseSayHelloBDS(const grpc::Status& status = grpc::Status::OK) 
+		{ if (SayHelloBDSStream) SayHelloBDSStream->Close(status); }
 
-		std::shared_ptr<SayHelloRecordSvrReader> SayHelloRecordPtr = nullptr;
+		//ServerStream
+		std::shared_ptr<SayHelloStreamReplySvrStream> SayHelloStreamReplyPtr = nullptr;
+		void ClientSayHelloStreamReply(HelloReply& response) { if (SayHelloStreamReplyPtr) SayHelloStreamReplyPtr->Send(response); }
+		void CloseSayHelloStreamReplyPtr(const grpc::Status& status = grpc::Status::OK)
+		{ if (SayHelloStreamReplyPtr) SayHelloStreamReplyPtr->Close(status); }
+
+		//ClientStream
+		std::shared_ptr<SayHelloRecordSvrStream> SayHelloRecordPtr = nullptr;
 	public:
 		void SetId(const std::string& id) { if (_id.empty()) _id = id; }
 		const std::string& GetId() const { return _id; }
@@ -382,10 +407,7 @@ protected:
 public:
 	RpcClientSession* GetClient(grpc::CallbackServerContext* context)
 	{
-		std::string id;
-		if (!TryFindContextMetaData(context, "id", id))
-			return nullptr;
-		return GetClient(id);
+		return GetClient(GetContextMetaData(context, "id"));
 	}
 
 	RpcClientSession* GetClient(const std::string& id)
@@ -399,26 +421,60 @@ public:
 public:
 	//@ SECTION_SERVER_UNARY
 	//SERVER_BISTREAM_RECV
-	SERVER_UNARY(SayHello, HelloRequest, HelloReply)
+	//SERVER_UNARY(SayHello, HelloRequest, HelloReply)
+	class SayHelloSvrStream : public grpc::ServerUnaryReactor {
+	public:
+		void SetPtr(std::shared_ptr< SayHelloSvrStream> ptr) { _ptr = ptr; }
+	private:
+		void OnDone() override { _ptr = nullptr; }
+		void OnCancel() override { _ptr = nullptr; }
+	private:
+		std::shared_ptr< SayHelloSvrStream> _ptr = nullptr;
+	};
+protected:
+	virtual grpc::Status ServerSayHello(const HelloRequest* request, HelloReply* response) = 0;
+
+	grpc::ServerUnaryReactor* SayHello(grpc::CallbackServerContext* context, const HelloRequest* request, HelloReply* response) override {
+		auto stream = std::make_shared<SayHelloSvrStream>();
+		stream->SetPtr(stream);
+		auto* call = new RpcJob<HelloRequest>();
+		call->stream = stream;
+		call->execute = [this, stream, request, response](google::protobuf::Message* m, std::any s)
+			{
+				stream->Finish(GetInstance()->ServerSayHello(request, response));
+			};
+		_jobQueue->Push(call);
+		return stream.get();
+	}
+
 
 	//@ SECTION_SERVER_BISTREAM_RECV
 	//SERVER_BISTREAM_RECV
 protected:
 	virtual void ServerSayHelloBDS(grpc::CallbackServerContext* context, const HelloRequest* request, std::any stream) = 0;
+	virtual void OnOpenSayHelloBDS(std::shared_ptr<SayHelloBDSSvrStream> stream) {};
+	virtual void OnCloseSayHelloBDS(std::shared_ptr<SayHelloBDSSvrStream> stream) {};
 public:
 	grpc::ServerBidiReactor<HelloRequest, HelloReply>* SayHelloBDS(grpc::CallbackServerContext* context) override 
 	{
-		auto stream = std::make_shared<SayHelloBDSSvrBiStream>(context);
-		stream->SetPtr(stream);
-		stream->RegisterRead(_jobQueue, [this](grpc::CallbackServerContext* ctx, const HelloRequest* req, std::any s) {
-				GetInstance()->ServerSayHelloBDS(ctx, req, s);
-			});
-		std::string id;
-		if (TryFindContextMetaData(context, "id", id))
+		std::string id = GetContextMetaData(context, "id");
+		auto& client = _clients[id];
+		std::shared_ptr<SayHelloBDSSvrStream> stream = client.SayHelloBDSStream;
+		if (!stream)
 		{
-			auto& client = _clients[id];
+			stream = std::make_shared<SayHelloBDSSvrStream>(context);
+			stream->SetPtr(stream);
+			stream->SetId(id);
 			client.SetId(id);
 			client.SayHelloBDSStream = stream;
+			OnOpenSayHelloBDS(stream);
+			stream->RegisterRead(_jobQueue, [this](grpc::CallbackServerContext* ctx, const HelloRequest* req, std::any s) {
+				GetInstance()->ServerSayHelloBDS(ctx, req, s);
+				});
+			stream->RegisterDone([this, &client, stream](SayHelloBDSSvrStream* self, const grpc::Status& status) {
+				GetInstance()->OnCloseSayHelloBDS(stream);
+				client.SayHelloBDSStream = nullptr;
+				});
 		}
 		return stream.get();
 	}
@@ -427,18 +483,33 @@ public:
 	//SERVER_SSTREAM_RECV
 protected:
 	virtual void ServerSayHelloStreamReply(grpc::CallbackServerContext* context, const HelloRequest* request, std::any stream) = 0;
+	virtual void OnOpenSayHelloStreamReply(std::shared_ptr<SayHelloStreamReplySvrStream> stream) {};
+	virtual void OnCloseSayHelloStreamReply(std::shared_ptr<SayHelloStreamReplySvrStream> stream) {};
 public:
 	grpc::ServerWriteReactor<HelloReply>* SayHelloStreamReply(grpc::CallbackServerContext* context, const HelloRequest* request) override
 	{
-		auto stream = std::make_shared<SayHelloStreamReplySvrWriter>(context);
-		stream->SetPtr(stream);
+		std::string id = GetContextMetaData(context, "id");
+		auto& client = _clients[id];
+		std::shared_ptr<SayHelloStreamReplySvrStream> stream = client.SayHelloStreamReplyPtr;
+		if (!stream)
+		{
+			stream = std::make_shared<SayHelloStreamReplySvrStream>(context);
+			stream->SetPtr(stream);
+			stream->SetId(id);
+			client.SayHelloStreamReplyPtr = stream;
+			OnOpenSayHelloStreamReply(stream);
+			stream->RegisterDone([this, &client, stream](SayHelloStreamReplySvrStream* self, const grpc::Status& status) {
+				GetInstance()->OnCloseSayHelloStreamReply(stream);
+				client.SayHelloStreamReplyPtr = nullptr;
+				});
+		}
 		auto* call = new RpcJob<HelloRequest>();
 		call->data = std::make_unique<HelloRequest>(*request);
 		call->stream = stream;
 		call->execute = [this, context](google::protobuf::Message* m, std::any s)
 			{
 				auto* castdMessage = static_cast<HelloRequest*>(m);
-				this->ServerSayHelloStreamReply(context, castdMessage, s);
+				GetInstance()->ServerSayHelloStreamReply(context, castdMessage, s);
 			};
 		_jobQueue->Push(call);
 		return stream.get();
@@ -446,23 +517,30 @@ public:
 
 protected:
 	virtual void ServerSayHelloRecord(grpc::CallbackServerContext* context, const HelloRequest* request, std::any stream) = 0;
-	virtual grpc::Status FinishServerSayHelloRecord(HelloReply* response, std::shared_ptr<SayHelloRecordSvrReader> stream) = 0;
+	virtual grpc::Status ServerFinishSayHelloRecord(HelloReply* response, std::shared_ptr<SayHelloRecordSvrStream> stream) = 0;
+	virtual void OnOpenSayHelloRecord(std::shared_ptr< SayHelloRecordSvrStream> stream) {};
+	virtual void OnCloseSayHelloRecord(std::shared_ptr< SayHelloRecordSvrStream> stream) {};
 public:
 	grpc::ServerReadReactor<HelloRequest>* SayHelloRecord(grpc::CallbackServerContext* context, HelloReply* response) override {
-		auto stream = std::make_shared<SayHelloRecordSvrReader>(context, response);
-		stream->SetPtr(stream);
-		stream->RegisterRead(_jobQueue, [response, stream, this](grpc::CallbackServerContext* ctx, const HelloRequest* request, std::any s, bool ok) {
-			if (!ok)
-				stream->Finish(FinishServerSayHelloRecord(response, stream));
-			else
-				ServerSayHelloRecord(ctx, request, s);
-			});
-		std::string id;
-		if (TryFindContextMetaData(context, "id", id))
+		std::string id = GetContextMetaData(context, "id");
+		auto& client = _clients[id];
+		std::shared_ptr< SayHelloRecordSvrStream> stream = client.SayHelloRecordPtr;
+		if (!stream)
 		{
-			auto& client = _clients[id];
+			stream = std::make_shared<SayHelloRecordSvrStream>(context, response);
+			stream->SetPtr(stream);
+			stream->SetId(id);
 			client.SetId(id);
 			client.SayHelloRecordPtr = stream;
+			OnOpenSayHelloRecord(stream);
+			stream->RegisterRead(_jobQueue, [response, stream, this](grpc::CallbackServerContext* ctx, const HelloRequest* request, std::any s, bool ok) {
+				if (!ok) stream->Close(ServerFinishSayHelloRecord(response, stream));
+				else GetInstance()->ServerSayHelloRecord(ctx, request, s);
+				});
+			stream->RegisterDone([this, &client, stream](SayHelloRecordSvrStream* self, const grpc::Status& status) {
+				GetInstance()->OnCloseSayHelloRecord(stream);
+				client.SayHelloRecordPtr = nullptr;
+				});
 		}
 		return stream.get();
 	}

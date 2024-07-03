@@ -9,29 +9,25 @@ GreeterServiceClient* GreeterServiceClientImpl::GetInstance()
 
 void GreeterServiceClientImpl::OnSayHello(const helloworld::HelloReply* response)
 {
-	cout << "OnSayHello" << endl;
-	cout << response->message() << endl;
+	cout << "OnSayHello: " << response->message() << endl;
 }
-
-void GreeterServiceClientImpl::OnDoneSayHelloRecord(HelloReply* reponse, const grpc::Status& status)
-{
-}
-
 
 void GreeterServiceClientImpl::ClientSayHelloBDS(const HelloReply* response, std::any stream)
 {
-	cout << "ClientSayHelloBDS" << endl;
-	cout << response->message() << endl;
+	cout << "ClientSayHelloBDS: " << response->message() << endl;
 }
 
 void GreeterServiceClientImpl::ClientSayHelloStreamReply(const HelloReply* response, std::any stream)
 {
-	cout << "ClientSayHelloStreamReply" << endl;
-	cout << response->message() << endl;
+	cout << "ClientSayHelloStreamReply: " << response->message() << endl;
 }
 
-void GreeterServiceClientImpl::OnDoneSayHelloStreamReply(const::grpc::Status& status)
+void GreeterServiceClientImpl::OnCloseSayHelloStreamReply(const::grpc::Status& status)
 {
-	cout << "OnDoneSayHelloStreamReply" << endl;
-	cout << status.error_code() << endl;
+	cout << "OnDoneSayHelloStreamReply: " << status.error_code() << endl;
+}
+
+void GreeterServiceClientImpl::OnFinishSayHelloRecord(HelloReply* response, const grpc::Status& status)
+{
+	cout << "OnFinishSayHelloRecord: " << response->message() << endl;
 }

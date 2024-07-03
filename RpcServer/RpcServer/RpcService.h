@@ -17,15 +17,12 @@ public:
 		_jobQueue = jobQ;
 	}
 
-	bool TryFindContextMetaData(grpc::CallbackServerContext* context, const std::string& key, std::string& outValue)
+	std::string GetContextMetaData(grpc::CallbackServerContext* context, const std::string& key)
 	{
 		auto it = context->client_metadata().find(key);
-		if (it != context->client_metadata().end())
-		{
-			outValue = std::string(it->second.data(), it->second.length());
-			return  true;
-		}
-		return false;
+		if (it == context->client_metadata().end())
+			return  "";
+		return std::string(it->second.data(), it->second.length());
 	}
 protected:
 	RpcServer* _server = nullptr;

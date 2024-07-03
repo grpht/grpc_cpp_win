@@ -41,13 +41,8 @@ call->response_reader->Finish(static_cast<RES*>(call->data.get()), &call->status
 protected: \
 virtual void On##FUNC(const RES* response) = 0; \
 
-#define CAST_SERVER_BISTREAM(FUNC, stream) std::any_cast<std::shared_ptr<FUNC##SvrBiStream>>(stream)
-#define CAST_CLIENT_BISTREAM(FUNC, stream) std::any_cast<std::shared_ptr<FUNC##CltBiStream>>(stream)
-
-#define CAST_SERVER_WRITER(FUNC, stream) std::any_cast<std::shared_ptr<FUNC##SvrWriter>>(stream)
-
-#define CAST_CLIENT_WRITER(FUNC, stream) std::any_cast<std::shared_ptr<FUNC##CltWriter>>>(stream)
-
+#define CAST_SERVER_STREAM(FUNC, stream) std::any_cast<std::shared_ptr<FUNC##SvrStream>>(stream)
+#define CAST_CLIENT_STREAM(FUNC, stream) std::any_cast<std::shared_ptr<FUNC##CltStream>>(stream)
 
 template<typename T>
 class RpcDoneModule

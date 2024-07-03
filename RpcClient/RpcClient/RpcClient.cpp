@@ -11,30 +11,44 @@
 
 void TestUnary(GreeterServiceClientImpl* greeter)
 {
-    for (int i = 0; i < 5; ++i)
+    for (int i = 0; i < 100; ++i)
     {
         std::string user("unary" + std::to_string(i));
         HelloRequest request;
         request.set_name(user);
         greeter->ServerSayHello(request);
+        std::this_thread::sleep_for(std::chrono::milliseconds(9));
     }
 }
 
 void TestBiStream(GreeterServiceClientImpl* greeter)
 {
-    for (int i = 0; i < 5000; i++) {
+    for (int i = 0; i < 100; i++) {
         std::string user("bidistream " + std::to_string(i));
         HelloRequest request;
         request.set_name(user);
         greeter->ServerSayHelloBDS(request);
+        std::this_thread::sleep_for(std::chrono::milliseconds(9));
     }
 }
 
 void TestServerStream(GreeterServiceClientImpl* greeter)
 {
     HelloRequest req;
-    req.set_name("zzz");
+    req.set_name("TestServerStream");
     greeter->ServerSayHelloStreamReply(req);
+}
+
+void TestClientStream(GreeterServiceClientImpl* greeter)
+{
+    for (int i = 0; i < 100; ++i)
+    {
+        HelloRequest req;
+        req.set_name("TestClientStream" + std::to_string(i));
+        greeter->ServerSayHelloRecord(req);
+        std::this_thread::sleep_for(std::chrono::milliseconds(9));
+    }
+    greeter->ServerFinishSayHelloRecord();
 }
 
 int main(int argc, char* argv[])
@@ -49,13 +63,14 @@ int main(int argc, char* argv[])
     client.Connect("localhost", 9999);
 
     //test
-    //std::thread testUnary = std::thread(TestUnary, &client);
-    //std::thread testBistream = std::thread(TestBiStream, &client);
+    std::thread testUnary = std::thread(TestUnary, &client);
+    std::thread testBistream = std::thread(TestBiStream, &client);
     std::thread testServerStream = std::thread(TestServerStream, &client);
-
+    std::thread testClientStream = std::thread(TestClientStream, &client);
     //testUnary.join();
     //testBistream.join();
     testServerStream.join();
+    //testClientStream.join();
 
     unaryCallbackThread.join();
     flushThread.join();

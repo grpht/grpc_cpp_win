@@ -7,57 +7,49 @@ GreeterService* GreeterServiceImpl::GetInstance()
 	return this;
 }
 
-grpc::Status GreeterServiceImpl::ServerSayHello(const helloworld::HelloRequest* request, helloworld::HelloReply* response)
+grpc::Status GreeterServiceImpl::ServerSayHello(const HelloRequest* request, HelloReply* response)
 {
-	cout << "serverSayHello" << endl;
-
-	string prefix("Hello");
-	response->set_message(prefix + request->name());
-	cout << response->message() << endl;
+	cout << "UNARY" << request->name() << endl;
+	response->set_message("UNARY " + request->name());
 
 	return grpc::Status::OK;
 }
 
 void GreeterServiceImpl::ServerSayHelloBDS(grpc::CallbackServerContext* context, const HelloRequest* request, std::any stream)
 {
+	cout << "BiStream " << request->name() << endl;
 	HelloReply response;
-	string prefix("Hello ");
-	response.set_message(prefix + request->name());
-	auto client = GetClient(context);
-	if (client)
+	response.set_message("BISTREAM " + request->name());
+	if (auto s = CAST_SERVER_STREAM(SayHelloBDS, stream))
 	{
-		cout << "session: " << client->GetId() << endl;
-		cout << request->name() << endl;
-		client->ClientSayHelloBDS(response);
+		s->Send(response);
 	}
 }
 
 void GreeterServiceImpl::ServerSayHelloStreamReply(grpc::CallbackServerContext* context, const HelloRequest* request, std::any stream)
 {
 	cout << "ServerSayHelloStreamReply" << endl;
-	if (auto s = CAST_SERVER_WRITER(SayHelloStreamReply, stream))
+	if (auto s = CAST_SERVER_STREAM(SayHelloStreamReply, stream))
 	{
-		for (int i = 0; i < 5000; ++i)
+		for (int i = 0; i < 100; ++i)
 		{
 			HelloReply response;
-			response.set_message(request->name() + "hi" + to_string(i));
-			cout << response.message() << endl;
+			response.set_message("S->C SStream " + request->name() + to_string(i));
 			s->Send(response);
+			std::this_thread::sleep_for(std::chrono::milliseconds(9));
 		}
-		s->Finish(grpc::Status::OK);
+		s->Close(grpc::Status::OK);
 	}
 }
 
 void GreeterServiceImpl::ServerSayHelloRecord(grpc::CallbackServerContext* context, const HelloRequest* request, std::any stream)
 {
-	if (auto s = std::any_cast<std::shared_ptr<SayHelloRecordSvrReader>>(stream))
-	{
-		cout << "ServerSayHelloRecord : " << request->name() << endl;
-	}
+	cout << "CSTREAM " <<request->name() << endl;
+	++cStreamCall;
 }
 
-grpc::Status GreeterServiceImpl::FinishServerSayHelloRecord(HelloReply* response, std::shared_ptr<SayHelloRecordSvrReader> stream)
+grpc::Status GreeterServiceImpl::ServerFinishSayHelloRecord(HelloReply* response, std::shared_ptr<SayHelloRecordSvrStream> stream)
 {
-	response->set_message("Receive OK");
+	response->set_message("CStream Result:" + std::to_string(cStreamCall));
 	return grpc::Status::OK;
 }

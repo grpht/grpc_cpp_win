@@ -1,6 +1,7 @@
 #include "GreeterServiceImpl.h"
 
 using namespace std;
+using namespace helloworld;
 
 GreeterService* GreeterServiceImpl::GetInstance()
 {

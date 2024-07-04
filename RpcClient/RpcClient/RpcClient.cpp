@@ -67,10 +67,10 @@ int main(int argc, char* argv[])
     std::thread testBistream = std::thread(TestBiStream, &client);
     std::thread testServerStream = std::thread(TestServerStream, &client);
     std::thread testClientStream = std::thread(TestClientStream, &client);
-    //testUnary.join();
-    //testBistream.join();
+    testUnary.join();
+    testBistream.join();
     testServerStream.join();
-    //testClientStream.join();
+    testClientStream.join();
 
     unaryCallbackThread.join();
     flushThread.join();

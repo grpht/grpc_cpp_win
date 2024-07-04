@@ -9,7 +9,7 @@ class GreeterServiceImpl : public GreeterService
 	// GreeterService을(를) 통해 상속됨
 	GreeterService* GetInstance() override;
 
-	grpc::Status ServerSayHello(const HelloRequest* request, HelloReply* response) override;
+	grpc::Status ServerSayHello(grpc::CallbackServerContext* context, const HelloRequest* request, HelloReply* response) override;
 	void ServerSayHelloBDS(grpc::CallbackServerContext* context, const HelloRequest* request, std::any stream) override;
 	void ServerSayHelloStreamReply(grpc::CallbackServerContext* context, const HelloRequest* request, std::any stream) override;
 	void ServerSayHelloRecord(grpc::CallbackServerContext* context, const HelloRequest* request, std::any stream) override;

@@ -7,7 +7,7 @@ GreeterService* GreeterServiceImpl::GetInstance()
 	return this;
 }
 
-grpc::Status GreeterServiceImpl::ServerSayHello(const HelloRequest* request, HelloReply* response)
+grpc::Status GreeterServiceImpl::ServerSayHello(grpc::CallbackServerContext* context, const HelloRequest* request, HelloReply* response)
 {
 	cout << "UNARY" << request->name() << endl;
 	response->set_message("UNARY " + request->name());

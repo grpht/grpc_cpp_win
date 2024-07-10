@@ -9,9 +9,7 @@ namespace RpcCodeGenerator
 {
     public class ProtoParser
     {
-        public string FileName { get; set; }
-
-        public RpcService ParseProtoFile(string protoContent)
+        public static RpcService ParseProtoFile(string protoContent)
         {
             RpcService service = new RpcService();
 
@@ -68,7 +66,7 @@ namespace RpcCodeGenerator
                     continue;
                 }
 
-                var rpcMethodMatches = Regex.Matches(trimmedLine, @"rpc\s+(\w+)\s*\((stream\s+)?(\w+)\)\s+returns\s+\((stream\s+)?(\w+)\)\s*\{?\s*\}?");
+                var rpcMethodMatches = Regex.Matches(trimmedLine, @"rpc\s+(\w+)\s*\(\s*(stream\s+)?(\w+)\s*\)\s+returns\s+\(\s*(stream\s+)?(\w+)\s*\)\s*\{?\s*\}?");
                 foreach (Match match in rpcMethodMatches)
                 {
                     RpcMethod method = new RpcMethod
@@ -87,48 +85,82 @@ namespace RpcCodeGenerator
             return service;
         }
 
-        public string GenerateCppClass(RpcService service, string env)
+        public static string GenerateServerRpc(RpcService service)
         {
             string className = service.name;
-
+            bool bNamespace = !String.IsNullOrEmpty(service.package);
             StringBuilder builder = new StringBuilder();
-            builder.Append(TextFormat.includeTxt);
-            builder.AppendLine($"#include \"{FileName}.grpc.pb.h\"");
+            builder.AppendLine("/* Auto-Generated File */");
+            builder.AppendLine(TextFormat.serverIncludeTxt);
+            builder.AppendLine($"#include models/\"{service.fileName}.grpc.pb.h\"");
             foreach (string im in service.imports)
             {
-                builder.AppendLine($"#include \"{im}.grpc.pb.h\"");
+                builder.AppendLine($"#include models/\"{im}.grpc.pb.h\"");
             }
-            builder.AppendLine($"namespace {service.package} \n{{");
-            builder.AppendLine(CreateMacro($"USING_{env}", service.methods, 2));
+            if (bNamespace) builder.AppendLine($"namespace {service.package} \n{{");
             builder.AppendLine($"  class {className}Service : public {className}::CallbackService, public RpcService");
-            builder.AppendLine($"  {{\n  public:");
-            if (env == "SERVER")
-            {
-                builder.AppendLine("    class Client {");
-                builder.AppendLine(CreateMacro($"REQ", service.methods, 6));
-                builder.AppendLine("    };");
-                builder.AppendLine("    std::unordered_map<std::string, Client> _clients;");
-            }
-            builder.AppendLine(CreateMacro($"METHOD_{env}", service.methods));
-            builder.AppendLine("  };\n}");
+            builder.AppendLine("  {");
+            builder.AppendLine($"  protected:");
+            builder.AppendLine($"    virtual {className}Service* GetInstance() = 0;");
+            builder.AppendLine($"  public:");
+            builder.AppendLine(CreateMacro(4, "SERVER", service.methods));
+            builder.AppendLine("  };");
+            if (bNamespace) builder.AppendLine("}");
 
             return builder.ToString();
         }
 
-        private string CreateMacro(string macroName, List<RpcMethod> methods, int tabSize = 4)
+        public static string GenerateClientRpc(RpcService service)
+        {
+            string className = service.name;
+            bool bNamespace = !String.IsNullOrEmpty(service.package);
+
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine("/* Auto-Generated File */");
+            builder.AppendLine(TextFormat.clientIncludeTxt);
+            builder.AppendLine($"#include models/\"{service.fileName}.grpc.pb.h\"");
+            foreach (string im in service.imports)
+            {
+                builder.AppendLine($"#include models/\"{im}.grpc.pb.h\"");
+            }
+            if (bNamespace) builder.AppendLine($"namespace {service.package} \n{{");
+            builder.AppendLine($"  class {className}ServiceClient : public RpcServiceClient");
+            builder.AppendLine("  {");
+            builder.AppendLine($"  protected:");
+            builder.AppendLine($"    virtual {className}ServiceClient* GetInstance() = 0;");
+            builder.AppendLine($"    void InitStub(std::shared_ptr<grpc::Channel> channel) override {{ _stub = {className}::NewStub(channel); }}");
+            builder.AppendLine($"    std::unique_ptr<{className}::Stub> _stub;");
+            builder.AppendLine($"  public:");
+            builder.AppendLine(CreateMacro(4, $"CLIENT", service.methods));
+            builder.AppendLine("  };");
+            if (bNamespace) builder.AppendLine("}");
+
+            return builder.ToString();
+        }
+
+
+        private static string CreateMacro(int tabSize, string macroName, List<RpcMethod> methods)
         {
             string macro = string.Empty;
             string indent = new string(' ', tabSize);
             foreach (var method in methods)
             {
                 if (method.requestStream && method.responseStream) // BiStream
+                {
                     macro += $"{indent}{macroName}_BISTREAM({method.name}, {method.request}, {method.response})\n";
+                }
                 else if (method.requestStream) //ClientStream
+                {
                     macro += $"{indent}{macroName}_CSTREAM({method.name}, {method.request}, {method.response})\n";
+                }
                 else if (method.responseStream) // ServerStream
+                {
                     macro += $"{indent}{macroName}_SSTREAM({method.name}, {method.request}, {method.response})\n";
+                }
                 else //Unary
+                {
                     macro += $"{indent}{macroName}_UNARY({method.name}, {method.request}, {method.response})\n";
+                }
             }
             return macro;
         }

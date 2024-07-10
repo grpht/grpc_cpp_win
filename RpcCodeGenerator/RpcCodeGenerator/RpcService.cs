@@ -19,6 +19,8 @@ namespace RpcCodeGenerator
     {
         public bool exist = false;
         public string name = "";
+        public string fileName = "";
+
         public string package = "";
         public List<string> imports = new List<string>();
         public List<RpcMethod> methods = new List<RpcMethod>();

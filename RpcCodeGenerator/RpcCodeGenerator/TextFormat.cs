@@ -8,7 +8,7 @@ namespace RpcCodeGenerator
 {
     internal class TextFormat
     {
-        public static string includeTxt =
+        public static string serverIncludeTxt =
 @"#pragma once
 #pragma warning(disable :4251)
 #pragma warning(disable :4819)
@@ -22,10 +22,15 @@ namespace RpcCodeGenerator
 #include <chrono>
 
 #include ""RpcService.h""
-#include ""RpcTemplate.h""
+#include ""utils/RpcTemplate.h""
+";
+        public static string clientIncludeTxt =
+@"#pragma once
+#pragma warning(disable :4251)
+#pragma warning(disable :4819)
 
-#include ""greeter.grpc.pb.h""
-
+#include ""utils/RpcTemplate.h""
+#include ""RpcServiceClient.h""
 ";
     }
 }

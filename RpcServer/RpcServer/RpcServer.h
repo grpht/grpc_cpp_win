@@ -17,6 +17,8 @@
 
 #include "GreeterServiceImpl.h"
 
+using namespace helloworld;
+
 enum class RpcServiceType
 {
 	//@SERVICE_TYPE

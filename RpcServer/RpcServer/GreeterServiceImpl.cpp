@@ -1,13 +1,14 @@
 #include "GreeterServiceImpl.h"
 
 using namespace std;
+using namespace helloworld;
 
 GreeterService* GreeterServiceImpl::GetInstance()
 {
 	return this;
 }
 
-grpc::Status GreeterServiceImpl::ServerSayHello(grpc::CallbackServerContext* context, const HelloRequest* request, HelloReply* response)
+grpc::Status GreeterServiceImpl::ServerSayHello(const HelloRequest* request, HelloReply* response, SayHelloSvrStream* stream)
 {
 	cout << "UNARY" << request->name() << endl;
 	response->set_message("UNARY " + request->name());
@@ -15,7 +16,7 @@ grpc::Status GreeterServiceImpl::ServerSayHello(grpc::CallbackServerContext* con
 	return grpc::Status::OK;
 }
 
-void GreeterServiceImpl::ServerSayHelloBDS(grpc::CallbackServerContext* context, const HelloRequest* request, std::any stream)
+void GreeterServiceImpl::ServerSayHelloBDS(const HelloRequest* request, SayHelloBDSSvrStream* stream)
 {
 	cout << "BiStream " << request->name() << endl;
 	HelloReply response;
@@ -26,7 +27,22 @@ void GreeterServiceImpl::ServerSayHelloBDS(grpc::CallbackServerContext* context,
 	}
 }
 
-void GreeterServiceImpl::ServerSayHelloStreamReply(grpc::CallbackServerContext* context, const HelloRequest* request, std::any stream)
+void helloworld::GreeterServiceImpl::OnOpenSayHelloBDS(std::shared_ptr<SayHelloBDSSvrStream> stream)
+{
+	std::string id = GetContextMetaData(stream->GetContext(), "id");
+	auto& client = _clients[id];
+	client.SetId(id);
+	client.SayHelloBDSPtr = stream;
+}
+
+void helloworld::GreeterServiceImpl::OnCloseSayHelloBDS(std::shared_ptr<SayHelloBDSSvrStream> stream)
+{
+	std::string id = GetContextMetaData(stream->GetContext(), "id");
+	auto& client = _clients[id];
+	client.SayHelloBDSPtr = nullptr;
+}
+
+void GreeterServiceImpl::ServerSayHelloStreamReply(const HelloRequest* request, SayHelloStreamReplySvrStream* stream)
 {
 	cout << "ServerSayHelloStreamReply" << endl;
 	if (auto s = CAST_SERVER_STREAM(SayHelloStreamReply, stream))
@@ -42,13 +58,43 @@ void GreeterServiceImpl::ServerSayHelloStreamReply(grpc::CallbackServerContext* 
 	}
 }
 
-void GreeterServiceImpl::ServerSayHelloRecord(grpc::CallbackServerContext* context, const HelloRequest* request, std::any stream)
+void helloworld::GreeterServiceImpl::OnOpenSayHelloStreamReply(std::shared_ptr<SayHelloStreamReplySvrStream> stream)
+{
+	std::string id = GetContextMetaData(stream->GetContext(), "id");
+	auto& client = _clients[id];
+	client.SetId(id);
+	client.SayHelloStreamReplyPtr = stream;
+}
+
+void helloworld::GreeterServiceImpl::OnCloseSayHelloStreamReply(std::shared_ptr<SayHelloStreamReplySvrStream> stream)
+{
+	std::string id = GetContextMetaData(stream->GetContext(), "id");
+	auto& client = _clients[id];
+	client.SayHelloStreamReplyPtr = nullptr;
+}
+
+void GreeterServiceImpl::ServerSayHelloRecord(const HelloRequest* request, SayHelloRecordSvrStream* stream)
 {
 	cout << "CSTREAM " <<request->name() << endl;
 	++cStreamCall;
 }
 
-grpc::Status GreeterServiceImpl::ServerFinishSayHelloRecord(HelloReply* response, std::shared_ptr<SayHelloRecordSvrStream> stream)
+void helloworld::GreeterServiceImpl::OnOpenSayHelloRecord(std::shared_ptr<SayHelloRecordSvrStream> stream)
+{
+	std::string id = GetContextMetaData(stream->GetContext(), "id");
+	auto& client = _clients[id];
+	client.SetId(id);
+	client.SayHelloRecordPtr = stream;
+}
+
+void helloworld::GreeterServiceImpl::OnCloseSayHelloRecord(std::shared_ptr<SayHelloRecordSvrStream> stream)
+{
+	std::string id = GetContextMetaData(stream->GetContext(), "id");
+	auto& client = _clients[id];
+	client.SayHelloRecordPtr = nullptr;
+}
+
+grpc::Status GreeterServiceImpl::ServerFinishSayHelloRecord(HelloReply* response, SayHelloRecordSvrStream* stream)
 {
 	response->set_message("CStream Result:" + std::to_string(cStreamCall));
 	return grpc::Status::OK;

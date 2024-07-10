@@ -12,12 +12,12 @@ void GreeterServiceClientImpl::OnSayHello(const helloworld::HelloReply* response
 	cout << "OnSayHello: " << response->message() << endl;
 }
 
-void GreeterServiceClientImpl::ClientSayHelloBDS(const HelloReply* response, std::any stream)
+void GreeterServiceClientImpl::ClientSayHelloBDS(const HelloReply* response, SayHelloBDSCltStream* stream)
 {
 	cout << "ClientSayHelloBDS: " << response->message() << endl;
 }
 
-void GreeterServiceClientImpl::ClientSayHelloStreamReply(const HelloReply* response, std::any stream)
+void GreeterServiceClientImpl::ClientSayHelloStreamReply(const HelloReply* response, SayHelloStreamReplyCltStream* stream)
 {
 	cout << "ClientSayHelloStreamReply: " << response->message() << endl;
 }

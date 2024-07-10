@@ -50,7 +50,7 @@ public:
 		ServerSetting(builder);
 
 		//@REGISTER_SERVICE
-		auto Greeter = new helloworld::GreeterServiceImpl();
+		auto Greeter = new GreeterServiceImpl();
 		Greeter->Prepare(this, &_jobQueue);
 		_services.insert(std::pair(RpcServiceType::Greeter, Greeter));
 		builder.RegisterService(Greeter);

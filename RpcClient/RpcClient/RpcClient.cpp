@@ -9,8 +9,6 @@
 
 #include "GreeterServiceClientImpl.h"
 
-using namespace helloworld;
-
 void TestUnary(GreeterServiceClientImpl* greeter)
 {
     for (int i = 0; i < 100; ++i)

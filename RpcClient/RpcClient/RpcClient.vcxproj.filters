@@ -16,14 +16,11 @@
     <Filter Include="소스 파일\models">
       <UniqueIdentifier>{02861e90-0a8d-40df-9f2d-543077150b54}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\utils">
-      <UniqueIdentifier>{2d9fe5c0-8bb0-47d3-a6ac-15311628a278}</UniqueIdentifier>
+    <Filter Include="소스 파일\commons">
+      <UniqueIdentifier>{8a9517d0-9e61-4a18-830c-fab3e22d7862}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="RpcClient.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Common\src\models\greeter.grpc.pb.cc">
       <Filter>소스 파일\models</Filter>
     </ClCompile>
@@ -33,14 +30,14 @@
     <ClCompile Include="GreeterServiceClientImpl.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Common\src\utils\ManualResetEventSlim.cpp">
-      <Filter>소스 파일\utils</Filter>
+    <ClCompile Include="..\..\Common\src\commons\ManualResetEventSlim.cpp">
+      <Filter>소스 파일\commons</Filter>
+    </ClCompile>
+    <ClCompile Include="RpcClient.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Common\src\utils\RpcJob.h">
-      <Filter>소스 파일\utils</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Common\src\models\greeter.grpc.pb.h">
       <Filter>소스 파일\models</Filter>
     </ClInclude>
@@ -53,14 +50,23 @@
     <ClInclude Include="GreeterServiceClientImpl.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\src\utils\RpcTemplate.h">
-      <Filter>소스 파일\utils</Filter>
+    <ClInclude Include="..\..\Common\src\commons\ManualResetEventSlim.h">
+      <Filter>소스 파일\commons</Filter>
     </ClInclude>
-    <ClInclude Include="RpcServiceClient.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="..\..\Common\src\commons\RpcJob.h">
+      <Filter>소스 파일\commons</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\src\utils\ManualResetEventSlim.h">
-      <Filter>소스 파일\utils</Filter>
+    <ClInclude Include="..\..\Common\src\commons\RpcServer.h">
+      <Filter>소스 파일\commons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\src\commons\RpcServiceBase.h">
+      <Filter>소스 파일\commons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\src\commons\RpcServiceClient.h">
+      <Filter>소스 파일\commons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\src\commons\RpcTemplate.h">
+      <Filter>소스 파일\commons</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

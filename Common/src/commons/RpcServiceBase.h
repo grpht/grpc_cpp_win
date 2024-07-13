@@ -6,9 +6,9 @@
 #include <grpcpp/grpcpp.h>
 #include <grpcpp/health_check_service_interface.h>
 
-#include "RpcJob.h"
+#include "commons/RpcJob.h"
 
-class RpcService
+class RpcServiceBase
 {
 public:
 	void Prepare(class RpcServer* server, RpcJobQueue<RpcJobBase>* jobQ)

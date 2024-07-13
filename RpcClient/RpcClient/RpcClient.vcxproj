@@ -105,7 +105,8 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\..\Common\src\models;..\..\Common\src\utils;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\Common\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4251 /wd4819 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -129,21 +130,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Common\src\commons\ManualResetEventSlim.cpp" />
     <ClCompile Include="..\..\Common\src\models\greeter.grpc.pb.cc" />
     <ClCompile Include="..\..\Common\src\models\greeter.pb.cc" />
-    <ClCompile Include="..\..\Common\src\utils\ManualResetEventSlim.cpp" />
     <ClCompile Include="GreeterServiceClientImpl.cpp" />
     <ClCompile Include="RpcClient.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Common\src\commons\ManualResetEventSlim.h" />
+    <ClInclude Include="..\..\Common\src\commons\RpcJob.h" />
+    <ClInclude Include="..\..\Common\src\commons\RpcServer.h" />
+    <ClInclude Include="..\..\Common\src\commons\RpcServiceBase.h" />
+    <ClInclude Include="..\..\Common\src\commons\RpcServiceClient.h" />
+    <ClInclude Include="..\..\Common\src\commons\RpcTemplate.h" />
     <ClInclude Include="..\..\Common\src\models\greeter.grpc.pb.h" />
     <ClInclude Include="..\..\Common\src\models\greeter.pb.h" />
-    <ClInclude Include="..\..\Common\src\utils\ManualResetEventSlim.h" />
-    <ClInclude Include="..\..\Common\src\utils\RpcJob.h" />
-    <ClInclude Include="..\..\Common\src\utils\RpcTemplate.h" />
     <ClInclude Include="GreeterServiceClient.h" />
     <ClInclude Include="GreeterServiceClientImpl.h" />
-    <ClInclude Include="RpcServiceClient.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -13,7 +13,7 @@
 #include <grpcpp/grpcpp.h>
 #include <grpcpp/health_check_service_interface.h>
 
-#include "RpcJob.h"
+#include "commons/RpcJob.h"
 
 #define SERVER_UNARY(FUNC,REQ,RES) \
 virtual ::grpc::ServerUnaryReactor* FUNC( \

@@ -1,9 +1,8 @@
 #pragma once
-#include "RpcTemplate.h"
+#include "commons/RpcTemplate.h"
+#include "commons/RpcServiceClient.h"
 
-#include "greeter.grpc.pb.h"
-
-#include "RpcServiceClient.h"
+#include "models/greeter.grpc.pb.h"
 
 using namespace helloworld;
 
@@ -35,6 +34,7 @@ protected:
 			StartRead(&_readMessage);
 			StartCall();
 		}
+		const std::string& GetId() const { return _id; }
 		void SetPtr(std::shared_ptr< SayHelloBDSCltStream> ptr) { _ptr = ptr; }
 		grpc::ClientContext* GetContext() { return &_context; }
 		void RegisterDone(std::function<void(SayHelloBDSCltStream*, const grpc::Status&)> doneCallback)
@@ -161,6 +161,7 @@ protected:
 			StartRead(&_readMessage);
 			StartCall();
 		}
+		const std::string& GetId() const { return _id; }
 		void SetPtr(std::shared_ptr<SayHelloStreamReplyCltStream> ptr) { _ptr = ptr; }
 		grpc::ClientContext* GetContext() { return &_context; }
 		void RegisterDone(std::function<void(SayHelloStreamReplyCltStream*, const grpc::Status&)> doneCallback)
@@ -235,6 +236,7 @@ protected:
 			stub->async()->SayHelloRecord(&_context, &_readMessage, this);
 			StartCall();
 		}
+		const std::string& GetId() const { return _id; }
 		void SetPtr(std::shared_ptr<SayHelloReplyCltStream> ptr) { _ptr = ptr; }
 		grpc::ClientContext* GetContext() { return &_context; }
 		void RegisterDone(std::function<void(SayHelloReplyCltStream*, const grpc::Status&)> doneCallback)

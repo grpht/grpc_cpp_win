@@ -13,10 +13,7 @@
 #include <grpc/support/log.h>
 #include <grpcpp/grpcpp.h>
 
-#include "absl/log/check.h"
-#include "absl/strings/str_format.h"
-
-#include "RpcJob.h"
+#include "commons/RpcJob.h"
 
 class RpcServiceClient
 {
@@ -24,12 +21,10 @@ public:
 	void Connect(const std::string& ip, uint16_t port)
 	{
 		OnBeforeConnect();
-		std::string address = absl::StrFormat("%s:%d", ip, port);
+		std::string address = std::format("{}:{}", ip, port);
 		grpc::ChannelArguments channelArgs;
-		channelArgs.SetInt(GRPC_ARG_KEEPALIVE_TIME_MS, 10000);
-		channelArgs.SetInt(GRPC_ARG_KEEPALIVE_TIMEOUT_MS, 5000);
-		channelArgs.SetInt(GRPC_ARG_KEEPALIVE_PERMIT_WITHOUT_CALLS, 1);
-		_channel = grpc::CreateCustomChannel(address, grpc::InsecureChannelCredentials(), channelArgs);
+		ChannelAgsSetting(channelArgs);
+		_channel = grpc::CreateCustomChannel(address, CredentialSetting(), channelArgs);
 		InitStub(_channel);
 		OnAfterConnected();
 	}
@@ -48,7 +43,6 @@ public:
 		bool ok = false;
 		while (_rpcCompletionQueue.Next(&gotTag, &ok)) {
 			auto* call = static_cast<RpcJobBase*>(gotTag);
-			CHECK(ok);
 			if (call->status.ok())
 				_jobQueue.Push(call);
 			else
@@ -65,6 +59,16 @@ protected:
 	virtual void InitStub(std::shared_ptr<grpc::Channel> channel) = 0;
 	virtual void OnBeforeConnect() {}
 	virtual void OnAfterConnected() {}
+	virtual void ChannelAgsSetting(grpc::ChannelArguments& channelArgs)
+	{
+		/*channelArgs.SetInt(GRPC_ARG_KEEPALIVE_TIME_MS, 10000);
+		channelArgs.SetInt(GRPC_ARG_KEEPALIVE_TIMEOUT_MS, 5000);
+		channelArgs.SetInt(GRPC_ARG_KEEPALIVE_PERMIT_WITHOUT_CALLS, 1);*/
+	}
+	virtual std::shared_ptr<grpc::ChannelCredentials> CredentialSetting()
+	{
+		return grpc::InsecureChannelCredentials();
+	}
 	
 protected:
 	std::shared_ptr<grpc::Channel> _channel;

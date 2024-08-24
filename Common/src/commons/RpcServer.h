@@ -10,6 +10,7 @@
 #include <thread>
 #include <chrono>
 #include <map>
+#include <atomic>
 
 #include "commons/RpcJob.h"
 #include "commons/RpcServiceBase.h"
@@ -49,15 +50,22 @@ public:
 
 	void Wait()
 	{
-		_server->Wait();
-	}
-	void AddService(const std::string& serviceName, std::shared_ptr<grpc::Service> service)
-	{
-		_services.insert(std::pair(serviceName, service));
-		if (auto casted = std::dynamic_pointer_cast<RpcServiceBase>(service))
+		if (!_wait)
 		{
-			casted->Prepare(this, &_jobQueue);
+			_wait = true;
+			_server->Wait();
 		}
+	}
+
+	template<class T>
+	T* AddService(const std::string& serviceName)
+	{
+		auto result = _services.emplace(serviceName, std::make_unique<T>());
+		if (!result.second) return nullptr;
+		T* casted = dynamic_cast<T*>(result.first->second.get());
+		if (casted)
+			casted->Prepare(this, &_jobQueue);
+		return casted;
 	}
 
 	template<typename T>
@@ -65,9 +73,35 @@ public:
 	{
 		auto iter = _services.find(serviceName);
 		if (iter != _services.end())
-			return static_cast<T*>(iter->second);
+			return static_cast<T*>(iter->second.get());
 		return nullptr;
 	}
+
+	bool IsShutdown() { return _shutdown.load(); }
+
+	void Shutdown()
+	{
+		if (!_shutdown.exchange(true))
+		{
+			for (auto& [serviceName, service] : _services)
+			{
+				auto castedService = dynamic_cast<RpcServiceBase*>(service.get());
+				if (castedService) castedService->Shutdown();
+			}
+			std::this_thread::sleep_for(std::chrono::milliseconds(500));
+			while (JobQueueSize() > 0)
+			{
+				Flush();
+				std::this_thread::yield();
+			}
+			_services.clear();
+			std::this_thread::sleep_for(std::chrono::milliseconds(500));
+			_server->Shutdown(std::chrono::system_clock::now() + std::chrono::seconds(30));
+			Wait();
+		}
+	}
+
+	size_t JobQueueSize() { return _jobQueue.Size(); }
 protected:
 	virtual void ServerSetting(grpc::ServerBuilder& builder)
 	{
@@ -82,6 +116,8 @@ protected:
 	}
 protected:
 	std::unique_ptr<grpc::Server> _server;
-	std::map<std::string, std::shared_ptr<grpc::Service>> _services;
+	std::map<std::string, std::unique_ptr<grpc::Service>> _services;
 	RpcJobQueue<RpcJobBase> _jobQueue;
+	std::atomic_bool _shutdown = false;
+	bool _wait = false;
 };

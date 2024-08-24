@@ -143,6 +143,7 @@
     <ClInclude Include="..\..\Common\src\commons\RpcServiceBase.h" />
     <ClInclude Include="..\..\Common\src\commons\RpcServiceClient.h" />
     <ClInclude Include="..\..\Common\src\commons\RpcTemplate.h" />
+    <ClInclude Include="..\..\Common\src\commons\RpcThreadManager.h" />
     <ClInclude Include="..\..\Common\src\models\greeter.grpc.pb.h" />
     <ClInclude Include="..\..\Common\src\models\greeter.pb.h" />
     <ClInclude Include="GreeterService.h" />

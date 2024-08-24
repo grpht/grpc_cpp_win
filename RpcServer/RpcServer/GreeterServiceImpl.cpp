@@ -62,6 +62,8 @@ void helloworld::GreeterServiceImpl::OnOpenSayHelloStreamReply(std::shared_ptr<S
 void helloworld::GreeterServiceImpl::OnCloseSayHelloStreamReply(std::shared_ptr<SayHelloStreamReplySvrStream> stream)
 {
 	auto& id = stream->GetId();
+	if (!_clients.contains(id))
+		return;
 	auto& client = _clients[id];
 	client.SayHelloStreamReplyPtr = nullptr;
 }
@@ -83,6 +85,8 @@ void helloworld::GreeterServiceImpl::OnOpenSayHelloRecord(std::shared_ptr<SayHel
 void helloworld::GreeterServiceImpl::OnCloseSayHelloRecord(std::shared_ptr<SayHelloRecordSvrStream> stream)
 {
 	auto& id = stream->GetId();
+	if (!_clients.contains(id))
+		return;
 	auto& client = _clients[id];
 	client.SayHelloRecordPtr = nullptr;
 }

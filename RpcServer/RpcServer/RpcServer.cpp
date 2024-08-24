@@ -7,15 +7,22 @@
 #include "commons/RpcServer.h"
 #include "GreeterServiceImpl.h"
 
-std::shared_ptr<helloworld::GreeterService> greeterService = nullptr;
+helloworld::GreeterService* greeterService = nullptr;
 RpcServer* server = nullptr;
-
+bool _quit = false;
 void Flush(RpcServer* runServer)
 {
-    while (true) {
+    while (!runServer->IsShutdown()) {
         runServer->Flush();
         std::this_thread::sleep_for(std::chrono::milliseconds(9));
     }
+}
+
+void Quit(RpcServer* runServer)
+{
+    std::string s;
+    std::cin >> s;
+    runServer->Shutdown();
 }
 
 
@@ -25,12 +32,15 @@ int main()
 
     server = new RpcServer();
     
-    greeterService = std::make_shared<helloworld::GreeterServiceImpl>();
-    server->AddService("greeter", greeterService);
+    greeterService = server->AddService<helloworld::GreeterServiceImpl>("greeter");
     
     server->Run("0.0.0.0", 9999);
     std::thread flushThread = std::thread(Flush, server);
+    std::thread quitThread = std::thread(Quit, server);
 
     server->Wait();
-    flushThread.join();
+    if (flushThread.joinable())
+        flushThread.join();
+    if (quitThread.joinable())
+        quitThread.join();
 }

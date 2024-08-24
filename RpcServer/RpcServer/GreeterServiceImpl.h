@@ -3,6 +3,7 @@
 #pragma warning(disable : 4819)
 
 #include "GreeterService.h"
+#include <grpcpp/support/server_callback.h>
 
 namespace helloworld
 {
@@ -14,6 +15,12 @@ namespace helloworld
 		class RpcClientSession
 		{
 		public:
+			void Shutdown()
+			{
+				CloseSayHelloBDS();
+				CloseSayHelloStreamReplyPtr();
+			}
+
 			//BiStream
 			std::shared_ptr<SayHelloBDSSvrStream> SayHelloBDSPtr = nullptr;
 			void ClientSayHelloBDS(HelloReply& response) { if (SayHelloBDSPtr) SayHelloBDSPtr->Send(response); }
@@ -52,6 +59,13 @@ namespace helloworld
 			if (it != _clients.end())
 				return &it->second;
 			return nullptr;
+		}
+
+		void Shutdown() override
+		{
+			for (auto& [id, client] : _clients)
+				client.Shutdown();
+			_clients.clear();
 		}
 
 		grpc::Status ServerSayHello(const HelloRequest* request, HelloReply* response, SayHelloSvrStream* stream) override;

@@ -14,6 +14,7 @@
 #include <grpcpp/grpcpp.h>
 
 #include "commons/RpcJob.h"
+#include "commons/RpcThreadManager.h"
 
 class RpcServiceClient
 {
@@ -26,16 +27,16 @@ public:
 		ChannelAgsSetting(channelArgs);
 		_channel = grpc::CreateCustomChannel(address, CredentialSetting(), channelArgs);
 		InitStub(_channel);
-		OnAfterConnected();
+
+		RpcThreadManager::Instance().BeginThread([this](std::any arg)
+			{
+				CheckConnectLoop();
+			});
 	}
 
 	void Flush()
 	{
-		while (true)
-		{
-			_jobQueue.Flush();
-			std::this_thread::sleep_for(std::chrono::milliseconds(9));
-		}
+		_jobQueue.Flush();
 	}
 
 	void UnaryReceiveCallback() {
@@ -53,12 +54,49 @@ public:
 		}
 	}
 
+	void CheckConnectLoop()
+	{
+		while (!_shutdown)
+		{
+			_state = _channel->GetState(_state != GRPC_CHANNEL_READY);
+			if (_state == GRPC_CHANNEL_READY && _connected == false)
+			{
+				_connected = true;
+				std::cout << "service connected" << std::endl;
+				OnAfterConnected();
+			}
+			else if (_state != GRPC_CHANNEL_READY && _connected == true)
+			{
+				_connected = false;
+				std::cout << "service disconnected" << std::endl;
+				OnDisconnected();
+			}
+			else if (_state == GRPC_CHANNEL_TRANSIENT_FAILURE || _state == GRPC_CHANNEL_SHUTDOWN)
+			{
+				_connected = false;
+				std::cout << "service try connect" << std::endl;
+				//Connect Failed
+			}
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		}
+	}
+
+	bool IsShutdown() const { return _shutdown; }
+
+	void Shutdown()
+	{
+		_shutdown = true;
+		_rpcCompletionQueue.Shutdown();
+		RpcThreadManager::Instance().QuitAllAndWiatForClose();
+	}
+
 	void SetId(const std::string& id) { _id = id; }
 	const std::string& GetId() const { return _id; }
 protected:
 	virtual void InitStub(std::shared_ptr<grpc::Channel> channel) = 0;
 	virtual void OnBeforeConnect() {}
 	virtual void OnAfterConnected() {}
+	virtual void OnDisconnected() {}
 	virtual void ChannelAgsSetting(grpc::ChannelArguments& channelArgs)
 	{
 		/*channelArgs.SetInt(GRPC_ARG_KEEPALIVE_TIME_MS, 10000);
@@ -76,4 +114,7 @@ protected:
 	
 	grpc::CompletionQueue _rpcCompletionQueue;
 	RpcJobQueue<RpcJobBase> _jobQueue;
+	grpc_connectivity_state _state = GRPC_CHANNEL_IDLE;
+	bool _connected = false;
+	bool _shutdown = false;
 };

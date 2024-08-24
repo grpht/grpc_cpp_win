@@ -73,6 +73,8 @@ public:
             std::cout << "jobQ Size : " << _q.size() << std::endl;
         }
     }
+
+    size_t Size() { return _q.size(); }
 private:
     std::queue<RpcJobBase*> _q;
     std::mutex _m;

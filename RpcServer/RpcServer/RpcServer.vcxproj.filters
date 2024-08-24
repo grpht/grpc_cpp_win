@@ -68,5 +68,8 @@
     <ClInclude Include="..\..\Common\src\commons\RpcTemplate.h">
       <Filter>소스 파일\commons</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Common\src\commons\RpcThreadManager.h">
+      <Filter>소스 파일\commons</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -9,6 +9,20 @@
 
 #include "GreeterServiceClientImpl.h"
 
+void Flush(GreeterServiceClientImpl* greeter)
+{
+    while (!greeter->IsShutdown())
+    {
+        greeter->Flush();
+    }
+}
+
+void Quit(GreeterServiceClientImpl* greeter)
+{
+    std::string s;
+    std::cin >> s;
+}
+
 void TestUnary(GreeterServiceClientImpl* greeter)
 {
     for (int i = 0; i < 100; ++i)
@@ -58,8 +72,8 @@ int main(int argc, char* argv[])
     client.SetId(argc == 1 ? "0": argv[1]);
 
     std::thread unaryCallbackThread = std::thread(&RpcServiceClient::UnaryReceiveCallback, &client);
-    std::thread flushThread = std::thread(&RpcServiceClient::Flush, &client);
-
+    std::thread flushThread = std::thread(Flush, &client);
+    std::thread quitThread = std::thread(Quit, &client);
     client.Connect("localhost", 9999);
 
     //test
@@ -67,13 +81,17 @@ int main(int argc, char* argv[])
     std::thread testBistream = std::thread(TestBiStream, &client);
     std::thread testServerStream = std::thread(TestServerStream, &client);
     std::thread testClientStream = std::thread(TestClientStream, &client);
+
+   
+
     testUnary.join();
     testBistream.join();
     testServerStream.join();
     testClientStream.join();
-
+    
     unaryCallbackThread.join();
     flushThread.join();
+    quitThread.join();
     return 0;
 }
 

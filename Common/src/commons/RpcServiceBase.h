@@ -24,6 +24,12 @@ public:
 			return  "";
 		return std::string(it->second.data(), it->second.length());
 	}
+
+	unsigned int GetContextId(grpc::CallbackServerContext* context)
+	{
+		return static_cast<unsigned int>(std::stoul(GetContextMetaData(context, "id")));
+	}
+	virtual void Shutdown() {}
 protected:
 	RpcServer* _server = nullptr;
 	RpcJobQueue<RpcJobBase>* _jobQueue = nullptr;
